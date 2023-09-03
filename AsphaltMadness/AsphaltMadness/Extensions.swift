@@ -2,6 +2,15 @@ import UIKit
 
 var listOfColors: [UIColor] = [.blue, .brown, .cyan, .green, .orange, .purple, .red, .yellow, .systemPink]
 
+var dangerObjectsList: [UIImage?] = [UIImage(named: "redDangerObject"),
+                                 UIImage(named: "blackDangerObject"),
+                                 UIImage(named: "blueDangerObject"),
+                                 UIImage(named: "greenDangerObject"),
+                                 UIImage(named: "lightBlueDangerObject"),
+                                 UIImage(named: "policeDangerObject"),
+                                 UIImage(named: "taxiDangerObject"), 
+                                 UIImage(named: "whiteDangerObject"), ]
+
 extension UIView {
     
     func roundCorners(radius: CGFloat = 10) {
@@ -37,6 +46,15 @@ extension UIView {
 
 extension UIViewController {
     //MARK: - Animations block
+    
+    func createCar(color: UIColor) -> UIView {
+        let car = UIView()
+        car.roundCorners()
+        car.dropShadow()
+        car.wobble()
+        car.backgroundColor = color
+        return car
+    }
     
     func animateWay(backView: UIView, upperView: UIView, duration: Double) {
         UIView.animate(withDuration: duration, delay: .zero, options: .curveLinear) {
@@ -76,5 +94,35 @@ extension UIViewController {
         layer.beginTime = timeSincePause
     }
     
-    
+    func showAlert(alertTitle: String? = nil,
+                   messageTitle: String,
+                   alertStyle: UIAlertController.Style,
+                   firstButtonTitle: String,
+                   secondButtonTitle: String? = nil,
+                   firstAlertActionStyle: UIAlertAction.Style,
+                   secondAlertActionStyle: UIAlertAction.Style? = nil,
+                   firstHandler: (() -> Void)? = nil,
+                   secondHandler: (() -> Void)? = nil) {
+        
+        let alert = UIAlertController(title: alertTitle,
+                                      message: messageTitle,
+                                      preferredStyle: .alert)
+        
+        let firstAlertActionButton = UIAlertAction(title: firstButtonTitle,
+                                                   style: firstAlertActionStyle) { _ in
+            firstHandler?()
+        }
+        alert.addAction(firstAlertActionButton)
+        
+        if let secondButtonTitle = secondButtonTitle,
+               let secondAlertActionStyle = secondAlertActionStyle {
+                let secondAlertActionButton = UIAlertAction(title: secondButtonTitle,
+                                                            style: secondAlertActionStyle) { _ in
+                    secondHandler?()
+                }
+                alert.addAction(secondAlertActionButton)
+            }
+        
+        self.present(alert, animated: true, completion: nil)
+    }
 }

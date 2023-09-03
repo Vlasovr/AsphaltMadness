@@ -7,16 +7,14 @@ class MainVC: UIViewController {
     }
     
     //MARK: - Initialize two backgrounds to manage them in animations block
-    private lazy var backgroundView = BackgroundView()
-    
-    private lazy var upperBackgroundView = BackgroundView()
+    private var backgroundView = BackgroundView()
     
     private lazy var carView = {
-        let car = UIView()
-        if let colorIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.carColorIndex) as? Int {
-            car.backgroundColor = listOfColors[colorIndex]
+        if let color = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.carColorIndex) as? Int {
+            let car = self.createCar(color: listOfColors[color])
+            return car
         }
-        return car
+        return self.createCar(color: UIColor.systemBlue)
     }()
     
     private lazy var containerAlphaView = {
@@ -73,33 +71,39 @@ class MainVC: UIViewController {
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        view.layoutIfNeeded()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        //resumeLayer(layer: view.layer)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         setupFrames()
-        self.animateWay(backView: backgroundView,
-                        upperView: upperBackgroundView,
-                        duration: Constants.Game.roadAnimationSpeed)
+        if let colorIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.carColorIndex) as? Int {
+            carView.backgroundColor = listOfColors[colorIndex]
+        }
+        
+//        self.animateWay(backView: backgroundView,
+//                        upperView: upperBackgroundView,
+//                        duration: Constants.Game.roadAnimationSpeed)
     }
     
     @objc func goToSettingsScreen(_ sender: UIButton) {
         let settingsController = SettingsVC()
-        self.present(settingsController, animated: true)
+        navigationController?.pushViewController(settingsController, animated: true)
     }
     
     @objc func goToGameScreen(_ sender: UIButton) {
-  
+        
         let gameController = GameVC()
-        navigationController?.pushViewController(gameController, animated: true)
+       navigationController?.pushViewController(gameController, animated: true)
     }
 
-    //MARK: - Animations Block
-    
+    override func viewDidDisappear(_ animated: Bool) {
+        //pauseLayer(layer: view.layer)
+    }
 
 }
 // MARK: - Setuping frames and constraintes
@@ -108,7 +112,7 @@ extension MainVC {
     
     func addSubviews() {
         view.addSubview(backgroundView)
-        view.addSubview(upperBackgroundView)
+        //view.addSubview(upperBackgroundView)
         view.addSubview(carView)
         view.addSubview(containerAlphaView)
         view.addSubview(playButton)
@@ -124,13 +128,13 @@ extension MainVC {
         backgroundView.setupSubviews()
         backgroundView.bounds.origin.y -= view.frame.height
         
-        upperBackgroundView.frame = CGRect(x: view.frame.origin.x,
-                                           y: -view.frame.height,
-                                           width: view.frame.width,
-                                           height: view.frame.height
-        )
-        
-        upperBackgroundView.setupSubviews()
+//        upperBackgroundView.frame = CGRect(x: view.frame.origin.x,
+//                                           y: -view.frame.height,
+//                                           width: view.frame.width,
+//                                           height: view.frame.height
+//        )
+//
+//        upperBackgroundView.setupSubviews()
         
         carView.frame = CGRect(x: view.center.x - Constants.CarMetrics.carWidth / 2,
                                y: view.frame.height - Constants.Offsets.hyper - Constants.CarMetrics.carHeight,

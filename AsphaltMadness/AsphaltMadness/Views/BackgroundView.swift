@@ -59,8 +59,6 @@ final class BackgroundView: UIView {
     }
     
     private func setupViewsAndConstraints() {
-        
-        
         self.addSubview(leftCurb)
         
         leftCurb.snp.makeConstraints { make in
@@ -181,12 +179,13 @@ final class BackgroundView: UIView {
     }
     
     private func createCurbsObjects() -> UIImageView {
+        let object = UIImageView()
         if let name = listOfCurbesObjects.randomElement() {
-            let object = UIImageView(image: UIImage(named: name))
-            return object
+            object.image = UIImage(named: name)
+        } else {
+            object.randomiseColor()
         }
-        //ИСПРАВИТЬ
-        return UIImageView()
+        return object
     }
 
 }

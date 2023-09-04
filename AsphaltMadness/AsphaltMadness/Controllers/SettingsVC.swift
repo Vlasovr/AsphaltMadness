@@ -5,9 +5,8 @@ final class SettingsVC: UIViewController {
     // MARK: - Properties
     private var selectedColorIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.carColorIndex) as? Int
     private var selectedLevelIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.gameLevel) as? Int
-    private var selectedDangerObjectIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.dangerObjectIndex) as? Int
-    private var minimalisticDesign = UserDefaults.standard.object(forKey:
-                                                                                Constants.UserDefaultsKeys.dangerObjectMinimalisticDesign) as? Bool
+    private var selectedDangerObjectIndex: Int?
+    private var minimalisticDesign = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.minimalisticDesign) as? Bool
 
     private lazy var gamerNameTextField: UITextField = {
         let textField = UITextField()
@@ -92,6 +91,18 @@ final class SettingsVC: UIViewController {
         navigationController?.isNavigationBarHidden = false
         addSubviews()
         setupDangerObjectPanel()
+        
+        //MARK: - Заглушка, пока не сделается онбординг
+        if let entries = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.appEntries) as? Int,
+        entries < 2 {
+            selectedDangerObjectIndex = 0
+        } else {
+            selectedDangerObjectIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.dangerObjectIndex) as? Int
+        }
+        
+        if let selectedDangerObjectIndex = selectedDangerObjectIndex {
+            dangerObjectView.image = dangerObjectsList[selectedDangerObjectIndex]
+        }
     }
     
     private func addSubviews() {
@@ -114,6 +125,7 @@ final class SettingsVC: UIViewController {
             levelSegmentControl.selectedSegmentIndex = selectedLevelIndex
             segmentDidChange(levelSegmentControl)
         }
+        
         if let selectedDesign = minimalisticDesign {
             dangerDesignSegmentControl.selectedSegmentIndex = selectedDesign ? 0 : 1
             designSegmentDidChange(dangerDesignSegmentControl)
@@ -125,7 +137,7 @@ final class SettingsVC: UIViewController {
         UserDefaults.standard.set(selectedColorIndex, forKey: Constants.UserDefaultsKeys.carColorIndex)
         UserDefaults.standard.set(selectedLevelIndex, forKey: Constants.UserDefaultsKeys.gameLevel)
         UserDefaults.standard.set(selectedDangerObjectIndex, forKey: Constants.UserDefaultsKeys.dangerObjectIndex)
-        UserDefaults.standard.set(minimalisticDesign, forKey: Constants.UserDefaultsKeys.dangerObjectMinimalisticDesign)
+        UserDefaults.standard.set(minimalisticDesign, forKey: Constants.UserDefaultsKeys.minimalisticDesign)
     }
     
     // MARK: - Actions
@@ -142,7 +154,7 @@ final class SettingsVC: UIViewController {
     
     @objc func showNewImage(_ sender: UIButton) {
         let direction = sender == backButton ? -1 : 1
-        
+ 
         if let currentIndex = selectedDangerObjectIndex {
             let nextIndex = (currentIndex + direction + dangerObjectsList.count) % dangerObjectsList.count
             selectedDangerObjectIndex = nextIndex

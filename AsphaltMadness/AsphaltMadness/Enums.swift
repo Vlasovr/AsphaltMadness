@@ -20,6 +20,8 @@ enum Constants {
         static let pointLabelWidht = 300.0
         static let roadAnimationSpeed = 2.0
         static let curbsObjectsSide = 60.0
+        static let menuHeight = 250.0
+        static let menuWidth = 200.0
     }
     
     enum CarMetrics {
@@ -45,6 +47,7 @@ enum Constants {
         static let carColorIndex = "CarColor"
         static let gameLevel = "GameLevel"
         static let dangerObjectIndex = "DangerObjectIndex"
-        static let dangerObjectMinimalisticDesign = "DangerObjectMinimalisticDesign"
+        static let minimalisticDesign = "DangerObjectMinimalisticDesign"
+        static let appEntries = "AppEntries"
     }
 }

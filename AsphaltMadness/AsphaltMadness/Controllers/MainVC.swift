@@ -7,7 +7,9 @@ class MainVC: UIViewController {
     }
     
     //MARK: - Initialize two backgrounds to manage them in animations block
-    private var backgroundView = BackgroundView()
+    private lazy var backgroundView = BackgroundView()
+    
+    //private var upperBackgroundView = BackgroundView()
     
     private lazy var carView = {
         if let color = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.carColorIndex) as? Int {
@@ -22,6 +24,12 @@ class MainVC: UIViewController {
         view.backgroundColor = .black
         view.alpha = 0.3
         return view
+    }()
+    
+    private lazy var menuView = {
+        let menu = UIView()
+        
+        return menu
     }()
     
     //MARK: - Make! goodLooking points
@@ -46,18 +54,23 @@ class MainVC: UIViewController {
     }()
     
     private lazy var playButton = {
-        let button = UIButton()
-        button.setTitle("Play", for: .normal)
-
+        let button = AdaptiveButton(title: "Play")
+        button.backgroundColor = .systemBlue
         button.addTarget(self, action: #selector(goToGameScreen(_:)), for: .touchUpInside)
         return button
     }()
+
     
     private lazy var settingsButton = {
-        let button = UIButton()
-        button.setTitle("Settings", for: .normal)
-        
+        let button = AdaptiveButton(title: "Settings")
+        button.backgroundColor = .systemBlue
         button.addTarget(self, action: #selector(goToSettingsScreen(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var recordsButton = {
+        let button = AdaptiveButton(title: "Records")
+        button.backgroundColor = .systemBlue
         return button
     }()
     
@@ -71,12 +84,19 @@ class MainVC: UIViewController {
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
+
+    }
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+    
+        backgroundView.layoutIfNeeded()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        //resumeLayer(layer: view.layer)
+        playButton.roundCorners()
+        settingsButton.roundCorners()
+        recordsButton.roundCorners()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -84,7 +104,7 @@ class MainVC: UIViewController {
         if let colorIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.carColorIndex) as? Int {
             carView.backgroundColor = listOfColors[colorIndex]
         }
-        
+       
 //        self.animateWay(backView: backgroundView,
 //                        upperView: upperBackgroundView,
 //                        duration: Constants.Game.roadAnimationSpeed)
@@ -96,15 +116,18 @@ class MainVC: UIViewController {
     }
     
     @objc func goToGameScreen(_ sender: UIButton) {
-        
         let gameController = GameVC()
-       navigationController?.pushViewController(gameController, animated: true)
+        gameController.modalPresentationStyle = .fullScreen
+        present(gameController, animated: false)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
-        //pauseLayer(layer: view.layer)
     }
-
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        
+    }
 }
 // MARK: - Setuping frames and constraintes
 
@@ -112,11 +135,12 @@ extension MainVC {
     
     func addSubviews() {
         view.addSubview(backgroundView)
-        //view.addSubview(upperBackgroundView)
-        view.addSubview(carView)
         view.addSubview(containerAlphaView)
-        view.addSubview(playButton)
-        view.addSubview(settingsButton)
+        view.addSubview(menuView)
+        menuView.addSubview(playButton)
+        menuView.addSubview(settingsButton)
+        menuView.addSubview(recordsButton)
+        view.addSubview(carView)
     }
     
     func setupFrames() {
@@ -128,14 +152,6 @@ extension MainVC {
         backgroundView.setupSubviews()
         backgroundView.bounds.origin.y -= view.frame.height
         
-//        upperBackgroundView.frame = CGRect(x: view.frame.origin.x,
-//                                           y: -view.frame.height,
-//                                           width: view.frame.width,
-//                                           height: view.frame.height
-//        )
-//
-//        upperBackgroundView.setupSubviews()
-        
         carView.frame = CGRect(x: view.center.x - Constants.CarMetrics.carWidth / 2,
                                y: view.frame.height - Constants.Offsets.hyper - Constants.CarMetrics.carHeight,
                                width: Constants.CarMetrics.carWidth,
@@ -143,7 +159,6 @@ extension MainVC {
         )
         
         setupCarView(car: carView)
-        
     }
     
     private func setupCarView(car: UIView) {
@@ -153,20 +168,38 @@ extension MainVC {
     }
     
     private func setupConstraints() {
+        
         containerAlphaView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        menuView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview().offset(-Constants.Offsets.medium)
+            make.height.equalTo(Constants.Game.menuHeight)
+            make.width.equalTo(Constants.Game.menuWidth)
         }
         
         playButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.centerY.equalToSuperview()
+            make.width.equalTo(Constants.Game.buttonWidth * 2)
+            make.height.equalTo(Constants.Game.buttonHeight)
         }
         
         settingsButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview().offset(Constants.Offsets.hyper)
+            make.width.equalTo(Constants.Game.buttonWidth * 1.75)
+            make.height.equalTo(Constants.Game.buttonHeight)
+            make.top.equalTo(playButton.snp.bottom).offset(Constants.Offsets.medium)
         }
         
+        recordsButton.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.width.equalTo(Constants.Game.buttonWidth * 1.5)
+            make.height.equalTo(Constants.Game.buttonHeight)
+            make.top.equalTo(settingsButton.snp.bottom).offset(Constants.Offsets.medium)
+        }
     }
 }
 

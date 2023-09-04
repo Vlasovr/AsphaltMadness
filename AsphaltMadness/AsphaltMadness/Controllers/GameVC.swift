@@ -79,18 +79,18 @@ class GameVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = true
-        
         setupTimers()
+        addSubviews()
+        setupConstraints()
+
     }
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        view.layoutIfNeeded()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        addSubviews()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -101,13 +101,17 @@ class GameVC: UIViewController {
         }
         
         setupBackground()
-        setupConstraints()
         setupCarView(car: carView)
         
         self.animateWay(backView: backgroundView,
                         upperView: upperBackgroundView,
                         duration: animationSpeedUpCoef)
         
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        self.view.layerremoveAllAnimations()
+        self.view.subviews.forEach{ $0.removeFromSuperview() }
     }
     
     // MARK: - Touch events control
@@ -167,7 +171,7 @@ class GameVC: UIViewController {
     //MARK: - Realisation of danger objects with timer
     private func addDangerCars(x: CGFloat) {
         
-        if let isMinimalistic = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.dangerObjectMinimalisticDesign) as? Bool, isMinimalistic {
+        if let isMinimalistic = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.minimalisticDesign) as? Bool, isMinimalistic {
             createDangerImageView(x: x)
         } else {
             createDangerView(x: x)
@@ -213,16 +217,26 @@ class GameVC: UIViewController {
     }
     
     private func checkCarIsBumped(object: UIView) {
-        let _ = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [self] _ in
+        let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [self] _ in
             if let objectFrame = object.layer.presentation()?.frame {
-                let curbFrames = backgroundView.getCurbsFrames()
-                if carView.frame.intersects(objectFrame) || carView.frame.intersects(curbFrames.0) || carView.frame.intersects(curbFrames.1) {
+                if carView.frame.intersects(objectFrame) || isCurbesIntersect(with: carView) {
+                    
+                    carView.frame = CGRect(x: view.center.x - Constants.CarMetrics.carWidth / 2,
+                                           y: view.frame.height - Constants.Offsets.hyper - Constants.CarMetrics.carHeight,
+                                           width: Constants.CarMetrics.carWidth,
+                                           height: Constants.CarMetrics.carHeight)
                     object.removeFromSuperview()
                     carView.removeFromSuperview()
                     stopGame()
                 }
             }
         }
+        timersList.append(timer)
+    }
+    
+    private func isCurbesIntersect(with object: UIView) -> Bool {
+        let curbFrames = backgroundView.getCurbsFrames()
+        return object.frame.intersects(curbFrames.0) || object.frame.intersects(curbFrames.1) ? (true) : (false)
     }
     
     //MARK: - Animations Block
@@ -258,9 +272,7 @@ class GameVC: UIViewController {
         }
         
         let cancelAction = {
-            self.view.layerremoveAllAnimations()
-            self.view.subviews.forEach{ $0.removeFromSuperview() }
-            self.navigationController?.popViewController(animated: true)
+            self.dismiss(animated: true)
             return
         }
         

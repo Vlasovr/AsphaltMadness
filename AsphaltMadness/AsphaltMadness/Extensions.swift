@@ -9,7 +9,7 @@ var dangerObjectsList: [UIImage?] = [UIImage(named: "redDangerObject"),
                                  UIImage(named: "lightBlueDangerObject"),
                                  UIImage(named: "policeDangerObject"),
                                  UIImage(named: "taxiDangerObject"), 
-                                 UIImage(named: "whiteDangerObject"), ]
+                                 UIImage(named: "whiteDangerObject")]
 
 extension UIView {
     

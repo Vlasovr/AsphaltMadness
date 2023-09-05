@@ -10,6 +10,9 @@ enum Constants {
     }
     
     enum Game {
+        static let gameName = "AsphaltMadness"
+        static let gameNameLabelWidth = 380
+        static let gameNameLabelHeight = 100
         static let radius = 10.0
         static let leftEdge = 20.0
         static let text = "Some error found"

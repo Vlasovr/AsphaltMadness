@@ -106,7 +106,7 @@ extension UIViewController {
         
         let alert = UIAlertController(title: alertTitle,
                                       message: messageTitle,
-                                      preferredStyle: .alert)
+                                      preferredStyle: alertStyle)
         
         let firstAlertActionButton = UIAlertAction(title: firstButtonTitle,
                                                    style: firstAlertActionStyle) { _ in

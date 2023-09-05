@@ -112,6 +112,7 @@ class GameVC: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         self.view.layerremoveAllAnimations()
         self.view.subviews.forEach{ $0.removeFromSuperview() }
+        print("removed")
     }
     
     // MARK: - Touch events control
@@ -272,7 +273,7 @@ class GameVC: UIViewController {
         }
         
         let cancelAction = {
-            self.dismiss(animated: true)
+            self.navigationController?.popViewController(animated: true)
             return
         }
         

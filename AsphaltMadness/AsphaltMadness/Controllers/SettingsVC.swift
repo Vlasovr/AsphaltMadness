@@ -2,69 +2,195 @@ import UIKit
 
 final class SettingsVC: UIViewController {
     
-    private var selectedColor = 0
-    private var selectedLevel = 0
+    // MARK: - Properties
+    private var selectedColorName: String?
+    private var selectedLevel: Double?
+    private var selectedDangerObjectIndex: Int? = 0
+    private var isMinimalisticDesign: Bool?
     
-    private lazy var colorsCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        cv.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        cv.showsHorizontalScrollIndicator = false
-        return cv
-    }()
-    
-    private lazy var gamerNameTextField = {
+    private lazy var gamerNameTextField: UITextField = {
         let textField = UITextField()
         textField.backgroundColor = .blue
         textField.textColor = .white
         textField.textAlignment = .center
-        textField.text = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.gamerName) as? String
         return textField
     }()
     
-    private lazy var segmentedControl: UISegmentedControl = {
-        var segmentContr = UISegmentedControl(items: ["1", "2", "3"])
-        if let index = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.gameLevel) as? Int {
-            segmentContr.selectedSegmentIndex = index
-        }
-        segmentContr.addTarget(self, action: #selector(segmentDidChange(_:)), for: .valueChanged)
-        return segmentContr
+    private lazy var avatarImage: UIImageView = {
+        let avatar = UIImageView()
+        avatar.image = UIImage(systemName: "person.crop.circle.fill")
+        return avatar
     }()
-
+    
+    private lazy var carColorsCollectionView: UICollectionView = {
+        let layout = createCompositionalLayout()
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        cv.showsHorizontalScrollIndicator = false
+        cv.dataSource = self
+        cv.delegate = self
+        return cv
+    }()
+    
+    private lazy var dangerObjectView = {
+        let view = UIImageView()
+        if let selectedDangerObjectIndex {
+            let image = dangerObjectsList[selectedDangerObjectIndex]
+            view.image = UIImage(named: image)
+        }
+        return view
+    }()
+    
+    private lazy var dangerObjectsPanel = UIView()
+    
+    private lazy var backButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setBackgroundImage(UIImage(systemName: "arrowshape.backward.fill"), for: .normal)
+        button.addTarget(self, action: #selector(showNewImage(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var nextButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setBackgroundImage(UIImage(systemName: "arrowshape.right.fill"), for: .normal)
+        button.addTarget(self, action: #selector(showNewImage(_:)), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var dangerDesignSegmentControl: UISegmentedControl = {
+        let segmentControl = UISegmentedControl(items: ["2D", "Minimalistic"])
+        segmentControl.addTarget(self, action: #selector(designSegmentDidChange(_:)), for: .valueChanged)
+        return segmentControl
+    }()
+    
+    private lazy var levelSegmentControl: UISegmentedControl = {
+        let segmentControl = UISegmentedControl(items: ["easy", "medium", "hard", "Legend", "GOAT"])
+        segmentControl.addTarget(self, action: #selector(segmentDidChange(_:)), for: .valueChanged)
+        return segmentControl
+    }()
+    
+    private let colorsArray = Array(listOfColors.values)
+    // MARK: - View Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
-        addSubviews()
+        setupUI()
         setupConstraints()
-        colorsCollectionView.dataSource = self
-        colorsCollectionView.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         gamerNameTextField.roundCorners()
+        setupInitialValues()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        UserDefaults.standard.set(gamerNameTextField.text, forKey: Constants.UserDefaultsKeys.gamerName)
-        UserDefaults.standard.set(selectedColor, forKey: Constants.UserDefaultsKeys.carColorIndex)
-        UserDefaults.standard.set(selectedLevel, forKey: Constants.UserDefaultsKeys.gameLevel)
+        saveUserDefaults()
     }
     
-    @objc func segmentDidChange(_ sender: UISegmentedControl) {
-        selectedLevel = sender.selectedSegmentIndex
+    // MARK: - UI Setup
+    
+    private func setupUI() {
+        view.backgroundColor = .white
+        navigationController?.isNavigationBarHidden = false
+        addSubviews()
+        setupDangerObjectPanel()
+        //MARK: - Заглушка, пока не сделается онбординг
+        //        if let entries = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.appEntries) as? Int,
+        //        entries < 2 {
+        //            selectedDangerObjectName = 0
+        //        } else {
+        //            selectedDangerObjectName = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.dangerObjectIndex) as? Int
+        //        }
+        
+        //        if let selectedDangerObjectIndex = selectedDangerObjectName {
+        //          //  dangerObjectView.image = dangerObjectsList[selectedDangerObjectIndex]
+        //        }
+    }
+    
+    private func addSubviews() {
+        view.addSubview(gamerNameTextField)
+        view.addSubview(carColorsCollectionView)
+        view.addSubview(dangerObjectsPanel)
+        view.addSubview(levelSegmentControl)
+        view.addSubview(dangerDesignSegmentControl)
+    }
+    
+    // MARK: - User Defaults
+    
+    private func setupInitialValues() {
+        guard let savedsettings = UserDefaults.standard.object(UserSettings.self,
+                                                               forKey: Constants.UserDefaultsKeys.userSettingsKey) else {
+            return
+        }
+        
+        levelSegmentControl.selectedSegmentIndex = Int(savedsettings.gameLevel) - 1
+        dangerDesignSegmentControl.selectedSegmentIndex = savedsettings.gameDesign ? 0 : 1
+        gamerNameTextField.text = savedsettings.userName
+        dangerObjectView.image = UIImage(named: savedsettings.dangerCarImageName)
+    }
+    
+    private func saveUserDefaults() {
+        guard let settings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) else {
+            print("UserSettings not found in UserDefaults")
+            return
+        }
+        
+        if let userName = gamerNameTextField.text {
+            settings.userName = userName
+        } else {
+            print("userName is nil")
+        }
+        
+        if let selectedColorName = selectedColorName {
+            settings.heroCarColorName = selectedColorName
+        } else {
+            print("selectedColorName is nil")
+        }
+        
+        if let selectedDangerObjectIndex = selectedDangerObjectIndex {
+            settings.dangerCarImageName = dangerObjectsList[selectedDangerObjectIndex]
+        } else {
+            print("selectedDangerObjectIndex is nil")
+        }
+        
+        if let selectedLevel = selectedLevel {
+            settings.gameLevel = selectedLevel + 1
+        } else {
+            print("selectedLevel is nil")
+        }
+        
+        if let isMinimalisticDesign = isMinimalisticDesign {
+            settings.gameDesign = isMinimalisticDesign
+        } else {
+            print("isMinimalisticDesign is nil")
+        }
+        
+        UserDefaults.standard.set(encodable: settings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
+
+    }
+    
+    // MARK: - Actions
+    @objc private func segmentDidChange(_ sender: UISegmentedControl) {
+        selectedLevel = Double(sender.selectedSegmentIndex)
+    }
+    
+    @objc private func designSegmentDidChange(_ sender: UISegmentedControl) {
+        isMinimalisticDesign = sender.selectedSegmentIndex == 0
+    }
+    
+    @objc func showNewImage(_ sender: UIButton) {
+        let direction = sender == backButton ? -1 : 1
+        if let currentIndex = selectedDangerObjectIndex {
+            let nextIndex = (currentIndex + direction + dangerObjectsList.count) % dangerObjectsList.count
+            selectedDangerObjectIndex = nextIndex
+            dangerObjectView.image = UIImage(named: dangerObjectsList[nextIndex])
+        }
     }
 }
 
 extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    
-    private func addSubviews() {
-        view.addSubview(gamerNameTextField)
-        view.addSubview(colorsCollectionView)
-        view.addSubview(segmentedControl)
-    }
     
     private func setupConstraints() {
         gamerNameTextField.snp.makeConstraints { make in
@@ -74,22 +200,62 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
             make.width.equalTo(Constants.Settings.textFieldWidth)
         }
         
-        colorsCollectionView.snp.makeConstraints { make in
+        carColorsCollectionView.snp.makeConstraints { make in
             make.top.equalTo(gamerNameTextField.snp.bottom).offset(Constants.Offsets.medium)
             make.height.equalTo(Constants.Settings.collectionViewHeight)
             make.left.equalToSuperview()
             make.right.equalToSuperview()
         }
-        segmentedControl.snp.makeConstraints { make in
+        
+        dangerObjectsPanel.snp.makeConstraints { make in
+            make.top.equalTo(carColorsCollectionView.snp.bottom).offset(Constants.Offsets.medium)
+            make.height.equalTo(Constants.Settings.collectionViewHeight)
+            make.left.equalToSuperview().inset(Constants.Offsets.medium)
+            make.right.equalToSuperview().inset(Constants.Offsets.medium)
+        }
+        
+        dangerDesignSegmentControl.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview()
-            make.width.equalTo(colorsCollectionView.snp.width)
+            make.top.equalTo(dangerObjectsPanel.snp.bottom).offset(Constants.Offsets.medium)
+            
+        }
+        
+        levelSegmentControl.snp.makeConstraints { make in
+            make.top.equalTo(dangerDesignSegmentControl.snp.bottom).offset(Constants.Offsets.large)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(dangerObjectsPanel.snp.width).inset(Constants.Offsets.medium)
             make.height.equalTo(gamerNameTextField.snp.height)
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.width * 0.75, height: collectionView.frame.width )
+    private func setupDangerObjectPanel() {
+        dangerObjectsPanel.addSubview(dangerObjectView)
+        dangerObjectsPanel.addSubview(backButton)
+        dangerObjectsPanel.addSubview(nextButton)
+        dangerObjectsPanel.backgroundColor = .secondarySystemBackground
+        dangerObjectsPanel.roundCorners()
+        
+        dangerObjectView.roundCorners()
+        dangerObjectView.clipsToBounds = true
+        
+        dangerObjectView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalToSuperview().offset(Constants.Offsets.small)
+            make.height.equalTo(Constants.CarMetrics.carHeight * 1.8)
+            make.width.equalTo(Constants.CarMetrics.carWidth * 2)
+        }
+        
+        backButton.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-20)
+            make.width.height.equalTo(Constants.Game.buttonWidth)
+        }
+        
+        nextButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-20)
+            make.width.height.equalTo(Constants.Game.buttonWidth)
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -97,12 +263,12 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         let carView = UIView()
-        carView.backgroundColor = listOfColors[indexPath.item]
+        carView.backgroundColor = colorsArray[indexPath.item]
         carView.roundCorners()
         carView.dropShadow()
-        
         cell.contentView.addSubview(carView)
         
         carView.snp.makeConstraints { make in
@@ -112,40 +278,34 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
             make.width.equalTo(Constants.CarMetrics.carWidth)
         }
         
-        cell.backgroundColor = .lightGray
-        cell.layer.cornerRadius = 20
+        cell.backgroundColor = .white
+        cell.roundCorners()
+        cell.dropShadow()
         return cell
+        
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 10
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let keysArray = Array(listOfColors.keys)
+        
+        guard indexPath.item < keysArray.count else { return }
+        selectedColorName = keysArray[indexPath.item]
+        print("selected")
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
-    }
+    // MARK: - Compositional Layout
     
-    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+    private func createCompositionalLayout() -> UICollectionViewCompositionalLayout {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.8), heightDimension: .fractionalHeight(0.6))
+        let layoutItem = NSCollectionLayoutItem(layoutSize: itemSize)
+        layoutItem.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 0, trailing: 20)
         
-        let target = targetContentOffset.pointee
+        let layoutGroupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.8), heightDimension: .fractionalWidth(0.8))
+        let layoutGroup = NSCollectionLayoutGroup.horizontal(layoutSize: layoutGroupSize, subitem: layoutItem, count: 1)
         
-        let center = CGPoint(x: target.x + colorsCollectionView.bounds.width / 2, y: target.y + colorsCollectionView.bounds.height / 2)
+        let layoutSection = NSCollectionLayoutSection(group: layoutGroup)
+        layoutSection.orthogonalScrollingBehavior = .groupPagingCentered
         
-        guard let indexPath = colorsCollectionView.indexPathForItem(at: center) else { return }
-        
-        guard let attributes = colorsCollectionView.layoutAttributesForItem(at: indexPath) else { return }
-        
-        let insets = colorsCollectionView.contentInset
-        
-        let itemSize = attributes.frame.size
-        
-        let spacing = (colorsCollectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.minimumLineSpacing ?? 0
-        
-        let newX = round((target.x - insets.left) / (itemSize.width + spacing)) * (itemSize.width + spacing)
-        
-        targetContentOffset.pointee = CGPoint(x: newX, y: target.y)
-        colorsCollectionView.selectItem(at: indexPath, animated: true, scrollPosition: .left)
-        
-        selectedColor = indexPath.item
+        return UICollectionViewCompositionalLayout(section: layoutSection)
     }
 }

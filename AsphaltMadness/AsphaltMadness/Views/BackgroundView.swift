@@ -3,40 +3,28 @@ import SnapKit
 
 final class BackgroundView: UIView {
     
-    private lazy var asphaltImageView = {
-        let asphaltImageView = UIView()
-        asphaltImageView.backgroundColor = .lightGray
-        return asphaltImageView
+    private lazy var asphaltView = {
+        let asphaltView = UIView()
+        asphaltView.backgroundColor = .lightGray
+        return asphaltView
     }()
     
     private lazy var leftCurb = {
         let curb = UIView()
-        curb.backgroundColor = .systemYellow
+        curb.backgroundColor = .white
         return curb
     }()
     
     private lazy var rightCurb = {
         let curb = UIView()
-        curb.backgroundColor = .systemYellow
+        curb.backgroundColor = .white
         return curb
-    }()
-    
-    private lazy var listOfCurbesObjects = [String]()
-    
-    private var bushesView = {
-        let bush = UIImageView()
-        return bush
-    }()
-    
-    private lazy var parkingView = {
-        let cars = UIImageView()
-        return cars
     }()
     
     private lazy var listOfShadingViews = [UIView]()
     
     lazy var getSingleLineWidth = {
-        return self.asphaltImageView.frame.width / 4
+        return self.asphaltView.frame.width / 4
     }
     
     override init(frame: CGRect) {
@@ -59,8 +47,6 @@ final class BackgroundView: UIView {
     }
     
     private func setupViewsAndConstraints() {
-        
-        
         self.addSubview(leftCurb)
         
         leftCurb.snp.makeConstraints { make in
@@ -77,9 +63,9 @@ final class BackgroundView: UIView {
             make.bottom.equalToSuperview().offset(5)
             make.width.equalTo(Constants.Game.spacingForCurbs)
         }
-        self.addSubview(asphaltImageView)
+        self.addSubview(asphaltView)
         
-        asphaltImageView.snp.makeConstraints { make in
+        asphaltView.snp.makeConstraints { make in
             make.left.equalTo(leftCurb.snp.right)
             make.right.equalTo(rightCurb.snp.left)
             make.top.equalToSuperview()
@@ -87,9 +73,6 @@ final class BackgroundView: UIView {
         }
         
         setupShadeViews()
-        listOfCurbesObjects.append("Rock")
-        listOfCurbesObjects.append("Bush")
-        
     }
     
     private func setupShadeViews() {
@@ -97,18 +80,18 @@ final class BackgroundView: UIView {
         let spacingFactor: CGFloat = 0.5
         
         let centeredShadesView = UIView()
-        asphaltImageView.addSubview(centeredShadesView)
+        asphaltView.addSubview(centeredShadesView)
         listOfShadingViews.append(centeredShadesView)
         
         centeredShadesView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.centerX.equalTo(asphaltImageView.snp.centerX)
+            make.centerX.equalTo(asphaltView.snp.centerX)
             make.width.equalTo(shadesWidth)
         }
         
         let leftShadesView = UIView()
-        asphaltImageView.addSubview(leftShadesView)
+        asphaltView.addSubview(leftShadesView)
         listOfShadingViews.append(leftShadesView)
         
         leftShadesView.snp.makeConstraints { make in
@@ -119,7 +102,7 @@ final class BackgroundView: UIView {
         }
         
         let rightShadesView = UIView()
-        asphaltImageView.addSubview(rightShadesView)
+        asphaltView.addSubview(rightShadesView)
         listOfShadingViews.append(rightShadesView)
         
         rightShadesView.snp.makeConstraints { make in
@@ -152,39 +135,43 @@ final class BackgroundView: UIView {
     }
     
     private func setupCurbs() {
-        let objectSide = 30.0
+        let objectSide = Constants.Game.curbsObjectsSide
+        var isWhiteViewLeft = false
+        var isWhiteViewRight = false
         
-        for y in stride(from: objectSide * 2, to: self.bounds.height - objectSide * 2 , by: objectSide) {
-
-            let leftObject = createCurbsObjects()
-            let rightObject = createCurbsObjects()
+        for y in stride(from: -objectSide, to: self.frame.height - objectSide, by: objectSide) {
+            let leftObject = createCurbsObjects(&isWhiteViewLeft)
+            let rightObject = createCurbsObjects(&isWhiteViewRight)
+            
             leftCurb.addSubview(leftObject)
             rightCurb.addSubview(rightObject)
+            
             setRandomXPosition(to: leftObject,
-                               maxX: leftCurb.frame.width + objectSide,
+                               x: leftCurb.frame.origin.x,
                                y: y,
                                width: objectSide,
                                height: objectSide)
+            
             setRandomXPosition(to: rightObject,
-                               maxX: rightCurb.frame.width + objectSide,
+                               x: rightCurb.frame.origin.x,
                                y: y,
                                width: objectSide,
                                height: objectSide)
         }
     }
     
-    private func setRandomXPosition(to object: UIView, maxX: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) {
-        let x = CGFloat.random(in: (0...maxX))
+    private func createCurbsObjects(_ isWhite: inout Bool) -> UIImageView {
+        let object = UIImageView()
+        if isWhite {
+            object.backgroundColor = .red
+        } else {
+            object.backgroundColor = .white
+        }
+        isWhite.toggle()
+        return object
+    }
+    
+    private func setRandomXPosition(to object: UIView, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) {
         object.frame = CGRect(x: x, y: y, width: width, height: height)
     }
-    
-    private func createCurbsObjects() -> UIImageView {
-        if let name = listOfCurbesObjects.randomElement() {
-            let object = UIImageView(image: UIImage(named: name))
-            return object
-        }
-        //ИСПРАВИТЬ
-        return UIImageView()
-    }
-
 }

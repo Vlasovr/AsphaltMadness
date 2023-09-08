@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		22E9894D2FEDDDD69C1C9C2D /* Pods_AsphaltMadness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F07F57A60714F853FAEAA9 /* Pods_AsphaltMadness.framework */; };
 		5F570CC02A97CB0B00DA3E9C /* Jura-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5F570CBF2A97CB0B00DA3E9C /* Jura-Bold.ttf */; };
+		5F9160752AA665D700658263 /* AdaptiveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F9160742AA665D700658263 /* AdaptiveButton.swift */; };
+		5FB418612AA7800C00B356DC /* Blazed.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5FB418602AA77FDD00B356DC /* Blazed.ttf */; };
+		5FB418712AA8E91100B356DC /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB418702AA8E91100B356DC /* UserSettings.swift */; };
+		5FB418732AA8EA1200B356DC /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB418722AA8EA1200B356DC /* Records.swift */; };
+		5FB418752AA8F21600B356DC /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB418742AA8F21500B356DC /* Data.swift */; };
 		5FB8F2B02A91167000DD0B78 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2AF2A91167000DD0B78 /* AppDelegate.swift */; };
 		5FB8F2B22A91167000DD0B78 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2B12A91167000DD0B78 /* SceneDelegate.swift */; };
 		5FB8F2B92A91167100DD0B78 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5FB8F2B82A91167100DD0B78 /* Assets.xcassets */; };
@@ -20,13 +25,17 @@
 		5FB8F2DA2A9204AE00DD0B78 /* BackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2D92A9204AE00DD0B78 /* BackgroundView.swift */; };
 		5FB8F2E12A95244C00DD0B78 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2E02A95244C00DD0B78 /* Enums.swift */; };
 		5FD58C8F2A96895900A4B084 /* CarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD58C8E2A96895900A4B084 /* CarView.swift */; };
-		5FFBDC012A9D022600F2946F /* TurnButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FFBDC002A9D022600F2946F /* TurnButtonsView.swift */; };
 		5FFBDC272AA0BD0F00F2946F /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FFBDC262AA0BD0F00F2946F /* SettingsVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		54F07F57A60714F853FAEAA9 /* Pods_AsphaltMadness.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AsphaltMadness.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F570CBF2A97CB0B00DA3E9C /* Jura-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Jura-Bold.ttf"; sourceTree = "<group>"; };
+		5F9160742AA665D700658263 /* AdaptiveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveButton.swift; sourceTree = "<group>"; };
+		5FB418602AA77FDD00B356DC /* Blazed.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Blazed.ttf; sourceTree = "<group>"; };
+		5FB418702AA8E91100B356DC /* UserSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
+		5FB418722AA8EA1200B356DC /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Records.swift; sourceTree = "<group>"; };
+		5FB418742AA8F21500B356DC /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		5FB8F2AC2A91167000DD0B78 /* AsphaltMadness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AsphaltMadness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5FB8F2AF2A91167000DD0B78 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5FB8F2B12A91167000DD0B78 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -40,7 +49,6 @@
 		5FB8F2D92A9204AE00DD0B78 /* BackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView.swift; sourceTree = "<group>"; };
 		5FB8F2E02A95244C00DD0B78 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		5FD58C8E2A96895900A4B084 /* CarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarView.swift; sourceTree = "<group>"; };
-		5FFBDC002A9D022600F2946F /* TurnButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TurnButtonsView.swift; sourceTree = "<group>"; };
 		5FFBDC262AA0BD0F00F2946F /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		6102FC22ABBB670D9B314065 /* Pods-AsphaltMadness.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsphaltMadness.release.xcconfig"; path = "Target Support Files/Pods-AsphaltMadness/Pods-AsphaltMadness.release.xcconfig"; sourceTree = "<group>"; };
 		C32E7831934941CA6108BD0B /* Pods-AsphaltMadness.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsphaltMadness.debug.xcconfig"; path = "Target Support Files/Pods-AsphaltMadness/Pods-AsphaltMadness.debug.xcconfig"; sourceTree = "<group>"; };
@@ -71,6 +79,7 @@
 			isa = PBXGroup;
 			children = (
 				5F570CBF2A97CB0B00DA3E9C /* Jura-Bold.ttf */,
+				5FB418602AA77FDD00B356DC /* Blazed.ttf */,
 			);
 			path = Fonts;
 			sourceTree = "<group>";
@@ -99,6 +108,9 @@
 				5FB8F2DB2A93C22800DD0B78 /* Application */,
 				5FB8F2DC2A93C23B00DD0B78 /* Controllers */,
 				5FB8F2DF2A93C2A900DD0B78 /* Views */,
+				5FB418702AA8E91100B356DC /* UserSettings.swift */,
+				5FB418722AA8EA1200B356DC /* Records.swift */,
+				5FB418742AA8F21500B356DC /* Data.swift */,
 				5FB8F2D32A91291F00DD0B78 /* Extensions.swift */,
 				5FB8F2E02A95244C00DD0B78 /* Enums.swift */,
 				5FB8F2DD2A93C27900DD0B78 /* Resources */,
@@ -110,7 +122,6 @@
 		5FB8F2DB2A93C22800DD0B78 /* Application */ = {
 			isa = PBXGroup;
 			children = (
-				5F570CBC2A97C96F00DA3E9C /* Fonts */,
 				5FB8F2AF2A91167000DD0B78 /* AppDelegate.swift */,
 				5FB8F2B12A91167000DD0B78 /* SceneDelegate.swift */,
 			);
@@ -132,6 +143,7 @@
 		5FB8F2DD2A93C27900DD0B78 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5F570CBC2A97C96F00DA3E9C /* Fonts */,
 				5FB8F2B82A91167100DD0B78 /* Assets.xcassets */,
 			);
 			path = Resources;
@@ -140,9 +152,9 @@
 		5FB8F2DF2A93C2A900DD0B78 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				5F9160742AA665D700658263 /* AdaptiveButton.swift */,
 				5FD58C8E2A96895900A4B084 /* CarView.swift */,
 				5FB8F2D92A9204AE00DD0B78 /* BackgroundView.swift */,
-				5FFBDC002A9D022600F2946F /* TurnButtonsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -217,6 +229,7 @@
 			files = (
 				5FB8F2BC2A91167100DD0B78 /* LaunchScreen.storyboard in Resources */,
 				5FB8F2B92A91167100DD0B78 /* Assets.xcassets in Resources */,
+				5FB418612AA7800C00B356DC /* Blazed.ttf in Resources */,
 				5F570CC02A97CB0B00DA3E9C /* Jura-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -270,17 +283,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5FB418732AA8EA1200B356DC /* Records.swift in Sources */,
 				5FB8F2DA2A9204AE00DD0B78 /* BackgroundView.swift in Sources */,
+				5FB418712AA8E91100B356DC /* UserSettings.swift in Sources */,
 				5FB8F2CE2A91211F00DD0B78 /* MainVC.swift in Sources */,
 				5FD58C8F2A96895900A4B084 /* CarView.swift in Sources */,
 				5FB8F2E12A95244C00DD0B78 /* Enums.swift in Sources */,
 				5FFBDC272AA0BD0F00F2946F /* SettingsVC.swift in Sources */,
+				5FB418752AA8F21600B356DC /* Data.swift in Sources */,
 				5FB8F2B02A91167000DD0B78 /* AppDelegate.swift in Sources */,
 				5FB8F2CC2A91210B00DD0B78 /* AuthorizationVC.swift in Sources */,
+				5F9160752AA665D700658263 /* AdaptiveButton.swift in Sources */,
 				5FB8F2D02A91213D00DD0B78 /* GameVC.swift in Sources */,
 				5FB8F2B22A91167000DD0B78 /* SceneDelegate.swift in Sources */,
 				5FB8F2D42A91291F00DD0B78 /* Extensions.swift in Sources */,
-				5FFBDC012A9D022600F2946F /* TurnButtonsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

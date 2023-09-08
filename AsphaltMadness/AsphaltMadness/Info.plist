@@ -5,6 +5,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Jura-Bold.ttf</string>
+		<string>Blazed.ttf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

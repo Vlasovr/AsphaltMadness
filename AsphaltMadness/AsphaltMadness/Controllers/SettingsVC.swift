@@ -3,18 +3,23 @@ import UIKit
 final class SettingsVC: UIViewController {
     
     // MARK: - Properties
-    private var selectedColorIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.carColorIndex) as? Int
-    private var selectedLevelIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.gameLevel) as? Int
-    private var selectedDangerObjectIndex: Int?
-    private var minimalisticDesign = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.minimalisticDesign) as? Bool
-
+    private var selectedColorName: String?
+    private var selectedLevel: Double?
+    private var selectedDangerObjectIndex: Int? = 0
+    private var isMinimalisticDesign: Bool?
+    
     private lazy var gamerNameTextField: UITextField = {
         let textField = UITextField()
         textField.backgroundColor = .blue
         textField.textColor = .white
         textField.textAlignment = .center
-        textField.text = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.gamerName) as? String
         return textField
+    }()
+    
+    private lazy var avatarImage: UIImageView = {
+        let avatar = UIImageView()
+        avatar.image = UIImage(systemName: "person.crop.circle.fill")
+        return avatar
     }()
     
     private lazy var carColorsCollectionView: UICollectionView = {
@@ -31,7 +36,7 @@ final class SettingsVC: UIViewController {
         let view = UIImageView()
         if let selectedDangerObjectIndex {
             let image = dangerObjectsList[selectedDangerObjectIndex]
-            view.image = image
+            view.image = UIImage(named: image)
         }
         return view
     }()
@@ -57,26 +62,26 @@ final class SettingsVC: UIViewController {
         segmentControl.addTarget(self, action: #selector(designSegmentDidChange(_:)), for: .valueChanged)
         return segmentControl
     }()
-
+    
     private lazy var levelSegmentControl: UISegmentedControl = {
         let segmentControl = UISegmentedControl(items: ["easy", "medium", "hard", "Legend", "GOAT"])
         segmentControl.addTarget(self, action: #selector(segmentDidChange(_:)), for: .valueChanged)
         return segmentControl
     }()
     
+    private let colorsArray = Array(listOfColors.values)
     // MARK: - View Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
-        setupInitialValues()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         gamerNameTextField.roundCorners()
-
+        setupInitialValues()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -91,18 +96,17 @@ final class SettingsVC: UIViewController {
         navigationController?.isNavigationBarHidden = false
         addSubviews()
         setupDangerObjectPanel()
-        
         //MARK: - Заглушка, пока не сделается онбординг
-        if let entries = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.appEntries) as? Int,
-        entries < 2 {
-            selectedDangerObjectIndex = 0
-        } else {
-            selectedDangerObjectIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.dangerObjectIndex) as? Int
-        }
+        //        if let entries = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.appEntries) as? Int,
+        //        entries < 2 {
+        //            selectedDangerObjectName = 0
+        //        } else {
+        //            selectedDangerObjectName = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.dangerObjectIndex) as? Int
+        //        }
         
-        if let selectedDangerObjectIndex = selectedDangerObjectIndex {
-            dangerObjectView.image = dangerObjectsList[selectedDangerObjectIndex]
-        }
+        //        if let selectedDangerObjectIndex = selectedDangerObjectName {
+        //          //  dangerObjectView.image = dangerObjectsList[selectedDangerObjectIndex]
+        //        }
     }
     
     private func addSubviews() {
@@ -116,49 +120,72 @@ final class SettingsVC: UIViewController {
     // MARK: - User Defaults
     
     private func setupInitialValues() {
-        if let selectedColorIndex {
-            let indexPath = IndexPath(item: selectedColorIndex, section: 0)
-            carColorsCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: .centeredHorizontally)
+        guard let savedsettings = UserDefaults.standard.object(UserSettings.self,
+                                                               forKey: Constants.UserDefaultsKeys.userSettingsKey) else {
+            return
         }
         
-        if let selectedLevelIndex {
-            levelSegmentControl.selectedSegmentIndex = selectedLevelIndex
-            segmentDidChange(levelSegmentControl)
-        }
-        
-        if let selectedDesign = minimalisticDesign {
-            dangerDesignSegmentControl.selectedSegmentIndex = selectedDesign ? 0 : 1
-            designSegmentDidChange(dangerDesignSegmentControl)
-        }
+        levelSegmentControl.selectedSegmentIndex = Int(savedsettings.gameLevel) - 1
+        dangerDesignSegmentControl.selectedSegmentIndex = savedsettings.gameDesign ? 0 : 1
+        gamerNameTextField.text = savedsettings.userName
+        dangerObjectView.image = UIImage(named: savedsettings.dangerCarImageName)
     }
-
+    
     private func saveUserDefaults() {
-        UserDefaults.standard.set(gamerNameTextField.text, forKey: Constants.UserDefaultsKeys.gamerName)
-        UserDefaults.standard.set(selectedColorIndex, forKey: Constants.UserDefaultsKeys.carColorIndex)
-        UserDefaults.standard.set(selectedLevelIndex, forKey: Constants.UserDefaultsKeys.gameLevel)
-        UserDefaults.standard.set(selectedDangerObjectIndex, forKey: Constants.UserDefaultsKeys.dangerObjectIndex)
-        UserDefaults.standard.set(minimalisticDesign, forKey: Constants.UserDefaultsKeys.minimalisticDesign)
+        guard let settings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) else {
+            print("UserSettings not found in UserDefaults")
+            return
+        }
+        
+        if let userName = gamerNameTextField.text {
+            settings.userName = userName
+        } else {
+            print("userName is nil")
+        }
+        
+        if let selectedColorName = selectedColorName {
+            settings.heroCarColorName = selectedColorName
+        } else {
+            print("selectedColorName is nil")
+        }
+        
+        if let selectedDangerObjectIndex = selectedDangerObjectIndex {
+            settings.dangerCarImageName = dangerObjectsList[selectedDangerObjectIndex]
+        } else {
+            print("selectedDangerObjectIndex is nil")
+        }
+        
+        if let selectedLevel = selectedLevel {
+            settings.gameLevel = selectedLevel + 1
+        } else {
+            print("selectedLevel is nil")
+        }
+        
+        if let isMinimalisticDesign = isMinimalisticDesign {
+            settings.gameDesign = isMinimalisticDesign
+        } else {
+            print("isMinimalisticDesign is nil")
+        }
+        
+        UserDefaults.standard.set(encodable: settings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
+
     }
     
     // MARK: - Actions
-    
     @objc private func segmentDidChange(_ sender: UISegmentedControl) {
-        selectedLevelIndex = sender.selectedSegmentIndex
-        
+        selectedLevel = Double(sender.selectedSegmentIndex)
     }
     
     @objc private func designSegmentDidChange(_ sender: UISegmentedControl) {
-        minimalisticDesign = sender.selectedSegmentIndex == 0
+        isMinimalisticDesign = sender.selectedSegmentIndex == 0
     }
-
     
     @objc func showNewImage(_ sender: UIButton) {
         let direction = sender == backButton ? -1 : 1
- 
         if let currentIndex = selectedDangerObjectIndex {
             let nextIndex = (currentIndex + direction + dangerObjectsList.count) % dangerObjectsList.count
             selectedDangerObjectIndex = nextIndex
-            dangerObjectView.image = dangerObjectsList[nextIndex]
+            dangerObjectView.image = UIImage(named: dangerObjectsList[nextIndex])
         }
     }
 }
@@ -190,7 +217,7 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
         dangerDesignSegmentControl.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(dangerObjectsPanel.snp.bottom).offset(Constants.Offsets.medium)
-        
+            
         }
         
         levelSegmentControl.snp.makeConstraints { make in
@@ -217,13 +244,13 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
             make.height.equalTo(Constants.CarMetrics.carHeight * 1.8)
             make.width.equalTo(Constants.CarMetrics.carWidth * 2)
         }
-
+        
         backButton.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.bottom.equalToSuperview().offset(-20)
             make.width.height.equalTo(Constants.Game.buttonWidth)
         }
-
+        
         nextButton.snp.makeConstraints { make in
             make.trailing.equalToSuperview()
             make.bottom.equalToSuperview().offset(-20)
@@ -236,9 +263,10 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         let carView = UIView()
-        carView.backgroundColor = listOfColors[indexPath.item]
+        carView.backgroundColor = colorsArray[indexPath.item]
         carView.roundCorners()
         carView.dropShadow()
         cell.contentView.addSubview(carView)
@@ -254,10 +282,15 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
         cell.roundCorners()
         cell.dropShadow()
         return cell
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        selectedColorIndex = indexPath.item
+        let keysArray = Array(listOfColors.keys)
+        
+        guard indexPath.item < keysArray.count else { return }
+        selectedColorName = keysArray[indexPath.item]
+        print("selected")
     }
     
     // MARK: - Compositional Layout
@@ -276,5 +309,3 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
         return UICollectionViewCompositionalLayout(section: layoutSection)
     }
 }
-
-    

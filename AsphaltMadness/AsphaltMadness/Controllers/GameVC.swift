@@ -7,17 +7,11 @@ class GameVC: UIViewController {
     }
     
     //MARK: - Initialize two backgrounds to manage them in animations block
-    private lazy var backgroundView = BackgroundView()
+    private lazy var mainRoadView = BackgroundView()
     
-    private lazy var upperBackgroundView = BackgroundView()
+    private lazy var upperRoadView = BackgroundView()
     
-    private lazy var carView = {
-        if let color = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.carColorIndex) as? Int {
-            let car = self.createCar(color: listOfColors[color])
-            return car
-        }
-        return self.createCar(color: UIColor.systemBlue)
-    }()
+    private lazy var carView = UIView()
     
     //MARK: - Array of views pointers
     private var listOfСars = [UIView]()
@@ -50,20 +44,10 @@ class GameVC: UIViewController {
     private lazy var pointsLabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.font = UIFont(name: "Jura-Bold", size: Constants.FontSizes.mediumFont)
+        label.font = UIFont(name: "Jura-Bold", size: Constants.FontSizes.medium)
         return label
     }()
-    
-    //MARK: - SPEED Coefficient
-    private var timerCoefficient = 1.0 {
-        didSet {
-            animationSpeedUpCoef /= timerCoefficient
-        }
-    }
-    
-    private var animationSpeedUpCoef = 3.0
-    
-    
+
     //MARK: - Some counter that I would use
     private lazy var countUserCarActions = 0 {
         didSet {
@@ -79,33 +63,17 @@ class GameVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.isNavigationBarHidden = true
-        setupTimers()
         addSubviews()
         setupConstraints()
-
-    }
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        if let colorIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.carColorIndex) as? Int {
-            carView.backgroundColor = listOfColors[colorIndex]
-        }
-        
+
         setupBackground()
         setupCarView(car: carView)
         
-        self.animateWay(backView: backgroundView,
-                        upperView: upperBackgroundView,
-                        duration: animationSpeedUpCoef)
+        setupGameSettings()
         
     }
     
@@ -115,6 +83,18 @@ class GameVC: UIViewController {
         print("removed")
     }
     
+    private func setupGameSettings() {
+        if let userSettings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) {
+            let colorName = userSettings.heroCarColorName
+            let gameLevel = userSettings.gameLevel
+            carView.backgroundColor = listOfColors[colorName]
+            
+            self.animateRoad(backView: mainRoadView,
+                            upperView: upperRoadView,
+                            duration: gameLevel)
+            setupTimers(dangerObjectsSpeed: gameLevel, isMinimalistic: userSettings.gameDesign, dangerCarImageName: userSettings.dangerCarImageName)
+        }
+    }
     // MARK: - Touch events control
     @objc func turnDidTapped(_ sender: UIButton) {
         countUserCarActions += 1
@@ -124,7 +104,7 @@ class GameVC: UIViewController {
         }
         
         let direction = sender == leftButton ? -1.0 : 1.0
-        let xOffset = direction * (countUserCarActions < 2 ? carView.frame.width / 1.5 : backgroundView.getSingleLineWidth())
+        let xOffset = direction * (countUserCarActions < 2 ? carView.frame.width / 1.5 : mainRoadView.getSingleLineWidth())
         
         snap = UISnapBehavior(item: carView,
                               snapTo: CGPoint(x: carView.center.x + xOffset,
@@ -138,52 +118,60 @@ class GameVC: UIViewController {
         }
     }
     
-    private func setupTimers() {
-        
+    private func setupTimers(dangerObjectsSpeed: Double, isMinimalistic: Bool, dangerCarImageName: String) {
+        var timeCoefficient = 1.0
         let pointsTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            self.points += (Double.random(in: (0.0...3.0) ) * self.timerCoefficient)
-            self.timerCoefficient *= 1.1
+            self.points += (Double.random(in: (0.0...3.0) ) * timeCoefficient)
+            timeCoefficient *= 1.1
         }
         timersList.append(pointsTimer)
         
         let leftLineDangerTimer = Timer.scheduledTimer(withTimeInterval: 2.5, repeats: true) { _ in
             
-            self.addDangerCars(x: Constants.Game.spacingForCurbs + Constants.Offsets.small)
+            self.addDangerCars(x: Constants.Game.spacingForCurbs + Constants.Offsets.small,
+                               isMinimalistic: isMinimalistic,
+                               dangerObjectsSpeed: dangerObjectsSpeed,
+                               dangerCarImageName: dangerCarImageName)
         }
         timersList.append(leftLineDangerTimer)
         
         let leftCenteredDangerTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { _ in
             
-            self.addDangerCars(x: self.backgroundView.getSingleLineWidth() * 2 - Constants.CarMetrics.carWidth / 2)
+            self.addDangerCars(x: self.mainRoadView.getSingleLineWidth() * 2 - Constants.CarMetrics.carWidth / 2,
+                               isMinimalistic: isMinimalistic,
+                               dangerObjectsSpeed: dangerObjectsSpeed,
+                               dangerCarImageName: dangerCarImageName)
         }
         timersList.append(leftCenteredDangerTimer)
         
         let rightCenteredLineDangerTimer = Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
-            self.addDangerCars(x: self.backgroundView.getSingleLineWidth() * 3 - Constants.CarMetrics.carWidth / 2)
+            self.addDangerCars(x: self.mainRoadView.getSingleLineWidth() * 3 - Constants.CarMetrics.carWidth / 2,
+                               isMinimalistic: isMinimalistic,
+                               dangerObjectsSpeed: dangerObjectsSpeed,
+                               dangerCarImageName: dangerCarImageName)
         }
         timersList.append(rightCenteredLineDangerTimer)
         let rightLineDangerTimer = Timer.scheduledTimer(withTimeInterval: 5.5, repeats: true) { _ in
-            self.addDangerCars(x: self.backgroundView.getSingleLineWidth() * 4 - Constants.CarMetrics.carWidth / 2)
+            self.addDangerCars(x: self.mainRoadView.getSingleLineWidth() * 4 - Constants.CarMetrics.carWidth / 2,
+                               isMinimalistic: isMinimalistic,
+                               dangerObjectsSpeed: dangerObjectsSpeed,
+                               dangerCarImageName: dangerCarImageName)
         }
         timersList.append(rightLineDangerTimer)
     }
     
     
     //MARK: - Realisation of danger objects with timer
-    private func addDangerCars(x: CGFloat) {
-        
-        if let isMinimalistic = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.minimalisticDesign) as? Bool, isMinimalistic {
-            createDangerImageView(x: x)
-        } else {
-            createDangerView(x: x)
-        }
+    private func addDangerCars(x: CGFloat, isMinimalistic: Bool, dangerObjectsSpeed: Double, dangerCarImageName: String) {
+        isMinimalistic ? createDangerImageView(x: x, dangerCarImageName: dangerCarImageName, dangerObjectsSpeed: dangerObjectsSpeed) : createDangerView(x: x, dangerObjectsSpeed: dangerObjectsSpeed)
     }
     
-    private func createDangerImageView(x: CGFloat) {
+    private func createDangerImageView(x: CGFloat, dangerCarImageName: String, dangerObjectsSpeed: Double) {
         let dangerView = UIImageView()
-        if let selectedDangerObjectIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.dangerObjectIndex) as? Int {
-            let image = dangerObjectsList[selectedDangerObjectIndex]
+        if let image = UIImage(named: dangerCarImageName) {
             dangerView.image = image
+        } else {
+            dangerView.randomiseColor()
         }
         
         dangerView.wobble()
@@ -195,10 +183,10 @@ class GameVC: UIViewController {
                     height: Constants.CarMetrics.carHeight)
         
         listOfСars.append(dangerView)
-        animateDangerObject(object: dangerView)
+        animateDangerObject(object: dangerView, dangerObjectsSpeed: dangerObjectsSpeed)
     }
     
-    private func createDangerView(x: CGFloat) {
+    private func createDangerView(x: CGFloat, dangerObjectsSpeed: Double) {
         let car = UIView()
         
         view.addSubview(car)
@@ -210,7 +198,7 @@ class GameVC: UIViewController {
         car.roundCorners()
         car.dropShadow()
         listOfСars.append(car)
-        animateDangerObject(object: car)
+        animateDangerObject(object: car, dangerObjectsSpeed: dangerObjectsSpeed)
         
     }
     private func setPosition(to object: UIView, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) {
@@ -218,14 +206,9 @@ class GameVC: UIViewController {
     }
     
     private func checkCarIsBumped(object: UIView) {
-        let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [self] _ in
+        let timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [self] _ in
             if let objectFrame = object.layer.presentation()?.frame {
                 if carView.frame.intersects(objectFrame) || isCurbesIntersect(with: carView) {
-                    
-                    carView.frame = CGRect(x: view.center.x - Constants.CarMetrics.carWidth / 2,
-                                           y: view.frame.height - Constants.Offsets.hyper - Constants.CarMetrics.carHeight,
-                                           width: Constants.CarMetrics.carWidth,
-                                           height: Constants.CarMetrics.carHeight)
                     object.removeFromSuperview()
                     carView.removeFromSuperview()
                     stopGame()
@@ -236,15 +219,18 @@ class GameVC: UIViewController {
     }
     
     private func isCurbesIntersect(with object: UIView) -> Bool {
-        let curbFrames = backgroundView.getCurbsFrames()
+        let curbFrames = mainRoadView.getCurbsFrames()
         return object.frame.intersects(curbFrames.0) || object.frame.intersects(curbFrames.1) ? (true) : (false)
+    }
+    
+    private func countGamePoints () {
+        
     }
     
     //MARK: - Animations Block
     
-    private func animateDangerObject(object: UIView) {
-        guard let speedLevel = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.gameLevel) as? Double else { return }
-        UIView.animate(withDuration: 4 - speedLevel, delay: .zero, options: .curveLinear) {
+    private func animateDangerObject(object: UIView, dangerObjectsSpeed: Double) {
+        UIView.animate(withDuration: dangerObjectsSpeed, delay: .zero, options: .curveLinear) {
             object.frame.origin.y = self.view.frame.height
             self.checkCarIsBumped(object: object)
         } completion: { _ in
@@ -256,20 +242,23 @@ class GameVC: UIViewController {
     }
     
     private func stopGame() {
-        timerCoefficient = 1
         countUserCarActions = 0
-        pauseLayer(layer: backgroundView.layer)
-        pauseLayer(layer: upperBackgroundView.layer)
+        pauseLayer(layer: mainRoadView.layer)
+        pauseLayer(layer: upperRoadView.layer)
         timersList.forEach { $0.invalidate() }
         timersList.removeAll()
         
         let okAction = {
-            self.setupTimers()
+            if let userSettings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) {
+                self.setupTimers(dangerObjectsSpeed: userSettings.gameLevel, isMinimalistic: userSettings.gameDesign, dangerCarImageName: userSettings.dangerCarImageName)
+            } else {
+                print("Causes some error")
+            }
             self.points = 0
             self.view.addSubview(self.carView)
             self.setupCarView(car: self.carView)
-            self.resumeLayer(layer: self.backgroundView.layer)
-            self.resumeLayer(layer: self.upperBackgroundView.layer)
+            self.resumeLayer(layer: self.mainRoadView.layer)
+            self.resumeLayer(layer: self.upperRoadView.layer)
         }
         
         let cancelAction = {
@@ -286,8 +275,8 @@ class GameVC: UIViewController {
 extension GameVC {
     
     private func addSubviews() {
-        view.addSubview(backgroundView)
-        view.addSubview(upperBackgroundView)
+        view.addSubview(mainRoadView)
+        view.addSubview(upperRoadView)
         view.addSubview(carView)
         view.addSubview(pointsLabel)
         view.addSubview(buttonsContainerView)
@@ -296,22 +285,7 @@ extension GameVC {
     }
     
     private func setupBackground() {
-        backgroundView.frame = CGRect(x: view.frame.origin.x,
-                                      y: -view.frame.height,
-                                      width: view.frame.width,
-                                      height: view.frame.height)
-        
-        backgroundView.setupSubviews()
-        backgroundView.bounds.origin.y -= view.frame.height
-        
-        upperBackgroundView.frame = CGRect(x: view.frame.origin.x,
-                                           y: -view.frame.height,
-                                           width: view.frame.width,
-                                           height: view.frame.height
-        )
-        
-        upperBackgroundView.setupSubviews()
-        
+        setupRoadFrames(mainView: mainRoadView, upperView: upperRoadView)
     }
     
     private func setupCarView(car: UIView) {

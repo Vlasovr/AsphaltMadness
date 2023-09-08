@@ -15,7 +15,7 @@ final class AdaptiveButton: UIButton {
     private func configureButton() {
         self.backgroundColor = .systemBlue
         self.setTitleColor(.white, for: .normal)
-        self.layer.cornerRadius = 8
+        self.roundCorners()
         
         self.addTarget(self, action: #selector(touchDown), for: .touchDown)
         self.addTarget(self, action: #selector(touchUpInside), for: .touchUpInside)

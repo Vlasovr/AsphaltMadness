@@ -10,9 +10,11 @@ enum Constants {
     }
     
     enum Game {
+        
         static let gameName = "AsphaltMadness"
         static let gameNameLabelWidth = 380
         static let gameNameLabelHeight = 100
+        static let gameNameLabelRotationAngle = -0.7
         static let radius = 10.0
         static let leftEdge = 20.0
         static let text = "Some error found"
@@ -21,10 +23,10 @@ enum Constants {
         static let buttonWidth = 70.0
         static let pointLabelHeight = 40.0
         static let pointLabelWidht = 300.0
-        static let roadAnimationSpeed = 2.0
         static let curbsObjectsSide = 60.0
         static let menuHeight = 250.0
-        static let menuWidth = 200.0
+        static let menuWidth = 200
+        static let maxAnimationDuration = 5.5
     }
     
     enum CarMetrics {
@@ -40,9 +42,10 @@ enum Constants {
     
     
     enum FontSizes {
-        static let smallFont = 10.0
-        static let mediumFont = 20.0
-        static let largeFont = 40.0
+        static let small = 10.0
+        static let medium = 20.0
+        static let large = 30.0
+        static let hyper = 40.0
     }
     
     enum UserDefaultsKeys {
@@ -52,5 +55,6 @@ enum Constants {
         static let dangerObjectIndex = "DangerObjectIndex"
         static let minimalisticDesign = "DangerObjectMinimalisticDesign"
         static let appEntries = "AppEntries"
+        static let userSettingsKey = "userSettingsKey"
     }
 }

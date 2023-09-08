@@ -7,17 +7,11 @@ class MainVC: UIViewController {
     }
     
     //MARK: - Initialize two backgrounds to manage them in animations block
-    private lazy var backgroundView = BackgroundView()
+    private lazy var mainRoadView = BackgroundView()
     
-    private var upperBackgroundView = BackgroundView()
+    private var upperRoadView = BackgroundView()
     
-    private lazy var carView = {
-        if let color = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.carColorIndex) as? Int {
-            let car = self.createCar(color: listOfColors[color])
-            return car
-        }
-        return self.createCar(color: UIColor.systemBlue)
-    }()
+    private lazy var carView = UIView()
     
     private lazy var containerAlphaView = {
         let view = UIView()
@@ -30,7 +24,7 @@ class MainVC: UIViewController {
        let label = UILabel()
         label.text = "AsphaltMadness"
         label.textColor = .white
-        label.font = UIFont(name: "Blazed", size: 32)
+        label.font = UIFont(name: "Blazed", size: Constants.FontSizes.large)
         return label
     }()
     
@@ -39,16 +33,12 @@ class MainVC: UIViewController {
     //MARK: - Make! goodLooking points
     private lazy var menuLabel = {
         let label = UILabel()
-        label.font = UIFont(name: "Jura-Bold", size: Constants.FontSizes.mediumFont)
+        label.font = UIFont(name: "Jura-Bold", size: Constants.FontSizes.hyper)
         let attributes: [NSAttributedString.Key: Any] = [
             NSAttributedString.Key.foregroundColor: UIColor.blue,
             NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue
         ]
-        
         var attributtedString = NSMutableAttributedString(string: "Menu", attributes: attributes)
-        let addAttributes: [NSAttributedString.Key: Any] = [
-            NSAttributedString.Key.foregroundColor: UIColor.black,
-        ]
         label.attributedText = attributtedString
         return label
     }()
@@ -84,8 +74,8 @@ class MainVC: UIViewController {
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-
     }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
     }
@@ -99,13 +89,15 @@ class MainVC: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         setupFrames()
-        if let colorIndex = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.carColorIndex) as? Int {
-            carView.backgroundColor = listOfColors[colorIndex]
+        if let userSettings = UserDefaults.standard.object(UserSettings.self,
+                                                           forKey: Constants.UserDefaultsKeys.userSettingsKey) {
+            let gameLevel = userSettings.gameLevel
+            carView.backgroundColor = listOfColors[userSettings.heroCarColorName]
+            
+            self.animateRoad(backView: mainRoadView,
+                             upperView: upperRoadView,
+                             duration: gameLevel)
         }
-       
-        self.animateWay(backView: backgroundView,
-                        upperView: upperBackgroundView,
-                        duration: Constants.Game.roadAnimationSpeed)
     }
     
     @objc func goToSettingsScreen(_ sender: UIButton) {
@@ -117,21 +109,14 @@ class MainVC: UIViewController {
         let gameController = GameVC()
         navigationController?.pushViewController(gameController, animated: true)
     }
-
-    override func viewDidDisappear(_ animated: Bool) {
-        UIView.animate(withDuration: 0.3) {
-            
-        }
-    }
-
 }
 // MARK: - Setuping frames and constraintes
 
 extension MainVC {
     
     func addSubviews() {
-        view.addSubview(backgroundView)
-        view.addSubview(upperBackgroundView)
+        view.addSubview(mainRoadView)
+        view.addSubview(upperRoadView)
         view.addSubview(containerAlphaView)
         view.addSubview(gameNameLabel)
         view.addSubview(menuView)
@@ -143,22 +128,8 @@ extension MainVC {
     }
     
     func setupFrames() {
-        backgroundView.frame = CGRect(x: view.frame.origin.x,
-                                      y: -view.frame.height,
-                                      width: view.frame.width,
-                                      height: view.frame.height)
         
-        backgroundView.setupSubviews()
-        backgroundView.bounds.origin.y -= view.frame.height
-        
-        upperBackgroundView.frame = CGRect(x: view.frame.origin.x,
-                                           y: -view.frame.height,
-                                           width: view.frame.width,
-                                           height: view.frame.height
-        )
-        
-        upperBackgroundView.setupSubviews()
-        
+        setupRoadFrames(mainView: mainRoadView, upperView: upperRoadView)
         
         carView.frame = CGRect(x: view.center.x - Constants.CarMetrics.carWidth / 2,
                                y: view.frame.height - Constants.Offsets.hyper - Constants.CarMetrics.carHeight,
@@ -167,7 +138,8 @@ extension MainVC {
         )
         setupCarView(car: carView)
 
-        gameNameLabel.transform = CGAffineTransform(rotationAngle: -0.7)
+        gameNameLabel.transform = CGAffineTransform(rotationAngle:
+                                                        Constants.Game.gameNameLabelRotationAngle)
     }
     
     private func setupCarView(car: UIView) {
@@ -190,7 +162,7 @@ extension MainVC {
         
         menuView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(gameNameLabel.snp.bottom).offset(Constants.Offsets.medium)
+            make.top.equalTo(gameNameLabel.snp.bottom).offset(Constants.Offsets.big)
             make.height.equalTo(Constants.Game.menuHeight)
             make.width.equalTo(Constants.Game.menuWidth)
         }

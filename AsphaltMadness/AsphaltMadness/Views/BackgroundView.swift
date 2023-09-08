@@ -11,26 +11,14 @@ final class BackgroundView: UIView {
     
     private lazy var leftCurb = {
         let curb = UIView()
-        curb.backgroundColor = .systemIndigo
+        curb.backgroundColor = .white
         return curb
     }()
     
     private lazy var rightCurb = {
         let curb = UIView()
-        curb.backgroundColor = .systemIndigo
+        curb.backgroundColor = .white
         return curb
-    }()
-    
-    private lazy var listOfCurbesObjects = [String]()
-    
-    private var bushesView = {
-        let bush = UIImageView()
-        return bush
-    }()
-    
-    private lazy var parkingView = {
-        let cars = UIImageView()
-        return cars
     }()
     
     private lazy var listOfShadingViews = [UIView]()
@@ -85,9 +73,6 @@ final class BackgroundView: UIView {
         }
         
         setupShadeViews()
-        listOfCurbesObjects.append("rock")
-        listOfCurbesObjects.append("bush")
-        
     }
     
     private func setupShadeViews() {
@@ -151,41 +136,42 @@ final class BackgroundView: UIView {
     
     private func setupCurbs() {
         let objectSide = Constants.Game.curbsObjectsSide
+        var isWhiteViewLeft = false
+        var isWhiteViewRight = false
         
-        for y in stride(from: objectSide, to: self.bounds.height - objectSide * 2 , by: objectSide) {
-
-            let leftObject = createCurbsObjects()
-            let rightObject = createCurbsObjects()
+        for y in stride(from: -objectSide, to: self.frame.height - objectSide, by: objectSide) {
+            let leftObject = createCurbsObjects(&isWhiteViewLeft)
+            let rightObject = createCurbsObjects(&isWhiteViewRight)
+            
             leftCurb.addSubview(leftObject)
             rightCurb.addSubview(rightObject)
+            
             setRandomXPosition(to: leftObject,
-                               minX: -objectSide / 2,
-                               maxX: leftCurb.frame.width ,
+                               x: leftCurb.frame.origin.x,
                                y: y,
                                width: objectSide,
                                height: objectSide)
+            
             setRandomXPosition(to: rightObject,
-                               minX: asphaltView.frame.width - objectSide / 2,
-                               maxX: asphaltView.frame.width + rightCurb.frame.width,
+                               x: rightCurb.frame.origin.x,
                                y: y,
                                width: objectSide,
                                height: objectSide)
         }
     }
     
-    private func setRandomXPosition(to object: UIView, minX: CGFloat, maxX: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) {
-        let x = CGFloat.random(in: (minX...maxX))
-        object.frame = CGRect(x: x, y: y, width: width, height: height)
-    }
-    
-    private func createCurbsObjects() -> UIImageView {
+    private func createCurbsObjects(_ isWhite: inout Bool) -> UIImageView {
         let object = UIImageView()
-        if let name = listOfCurbesObjects.randomElement() {
-            object.image = UIImage(named: name)
+        if isWhite {
+            object.backgroundColor = .red
         } else {
-            object.randomiseColor()
+            object.backgroundColor = .white
         }
+        isWhite.toggle()
         return object
     }
-
+    
+    private func setRandomXPosition(to object: UIView, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) {
+        object.frame = CGRect(x: x, y: y, width: width, height: height)
+    }
 }

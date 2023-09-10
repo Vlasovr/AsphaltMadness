@@ -1,6 +1,6 @@
 import UIKit
 
-class MainVC: UIViewController {
+final class MainVC: UIViewController {
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent

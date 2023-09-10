@@ -1,6 +1,6 @@
 import UIKit
 
-class GameVC: UIViewController {
+final class GameVC: UIViewController {
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent

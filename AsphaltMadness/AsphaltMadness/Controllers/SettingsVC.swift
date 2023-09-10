@@ -16,8 +16,8 @@ final class SettingsVC: UIViewController {
         return textField
     }()
     
-    private lazy var avatarImage: UIImageView = {
-        let avatar = UIImageView()
+    private lazy var avatarImage = {
+        let avatar = CircularImageView()
         avatar.isUserInteractionEnabled = true
         return avatar
     }()
@@ -92,8 +92,6 @@ final class SettingsVC: UIViewController {
     }
     override func viewDidLayoutSubviews() {
         gamerNameTextField.roundCorners()
-        avatarImage.layer.cornerRadius = avatarImage.frame.width / 2
-        avatarImage.clipsToBounds = true
     }
     
     // MARK: - UI Setup

@@ -15,17 +15,16 @@
 		5FB418732AA8EA1200B356DC /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB418722AA8EA1200B356DC /* Records.swift */; };
 		5FB418752AA8F21600B356DC /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB418742AA8F21500B356DC /* Data.swift */; };
 		5FB418BB2AAC581400B356DC /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB418BA2AAC581400B356DC /* DataManager.swift */; };
+		5FB418EC2AAE204B00B356DC /* CircularImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB418EB2AAE204B00B356DC /* CircularImageView.swift */; };
 		5FB8F2B02A91167000DD0B78 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2AF2A91167000DD0B78 /* AppDelegate.swift */; };
 		5FB8F2B22A91167000DD0B78 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2B12A91167000DD0B78 /* SceneDelegate.swift */; };
 		5FB8F2B92A91167100DD0B78 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5FB8F2B82A91167100DD0B78 /* Assets.xcassets */; };
 		5FB8F2BC2A91167100DD0B78 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5FB8F2BA2A91167100DD0B78 /* LaunchScreen.storyboard */; };
-		5FB8F2CC2A91210B00DD0B78 /* AuthorizationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2CB2A91210B00DD0B78 /* AuthorizationVC.swift */; };
 		5FB8F2CE2A91211F00DD0B78 /* MainVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2CD2A91211F00DD0B78 /* MainVC.swift */; };
 		5FB8F2D02A91213D00DD0B78 /* GameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2CF2A91213D00DD0B78 /* GameVC.swift */; };
 		5FB8F2D42A91291F00DD0B78 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2D32A91291F00DD0B78 /* Extensions.swift */; };
 		5FB8F2DA2A9204AE00DD0B78 /* BackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2D92A9204AE00DD0B78 /* BackgroundView.swift */; };
 		5FB8F2E12A95244C00DD0B78 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB8F2E02A95244C00DD0B78 /* Enums.swift */; };
-		5FD58C8F2A96895900A4B084 /* CarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD58C8E2A96895900A4B084 /* CarView.swift */; };
 		5FFBDC272AA0BD0F00F2946F /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FFBDC262AA0BD0F00F2946F /* SettingsVC.swift */; };
 /* End PBXBuildFile section */
 
@@ -38,19 +37,18 @@
 		5FB418722AA8EA1200B356DC /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Records.swift; sourceTree = "<group>"; };
 		5FB418742AA8F21500B356DC /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		5FB418BA2AAC581400B356DC /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
+		5FB418EB2AAE204B00B356DC /* CircularImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularImageView.swift; sourceTree = "<group>"; };
 		5FB8F2AC2A91167000DD0B78 /* AsphaltMadness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AsphaltMadness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5FB8F2AF2A91167000DD0B78 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5FB8F2B12A91167000DD0B78 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		5FB8F2B82A91167100DD0B78 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5FB8F2BB2A91167100DD0B78 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5FB8F2BD2A91167100DD0B78 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5FB8F2CB2A91210B00DD0B78 /* AuthorizationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizationVC.swift; sourceTree = "<group>"; };
 		5FB8F2CD2A91211F00DD0B78 /* MainVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVC.swift; sourceTree = "<group>"; };
 		5FB8F2CF2A91213D00DD0B78 /* GameVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameVC.swift; sourceTree = "<group>"; };
 		5FB8F2D32A91291F00DD0B78 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		5FB8F2D92A9204AE00DD0B78 /* BackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView.swift; sourceTree = "<group>"; };
 		5FB8F2E02A95244C00DD0B78 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
-		5FD58C8E2A96895900A4B084 /* CarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarView.swift; sourceTree = "<group>"; };
 		5FFBDC262AA0BD0F00F2946F /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		6102FC22ABBB670D9B314065 /* Pods-AsphaltMadness.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsphaltMadness.release.xcconfig"; path = "Target Support Files/Pods-AsphaltMadness/Pods-AsphaltMadness.release.xcconfig"; sourceTree = "<group>"; };
 		C32E7831934941CA6108BD0B /* Pods-AsphaltMadness.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AsphaltMadness.debug.xcconfig"; path = "Target Support Files/Pods-AsphaltMadness/Pods-AsphaltMadness.debug.xcconfig"; sourceTree = "<group>"; };
@@ -141,7 +139,6 @@
 		5FB8F2DC2A93C23B00DD0B78 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				5FB8F2CB2A91210B00DD0B78 /* AuthorizationVC.swift */,
 				5FB8F2CD2A91211F00DD0B78 /* MainVC.swift */,
 				5FFBDC262AA0BD0F00F2946F /* SettingsVC.swift */,
 				5FB8F2CF2A91213D00DD0B78 /* GameVC.swift */,
@@ -164,8 +161,8 @@
 			isa = PBXGroup;
 			children = (
 				5F9160742AA665D700658263 /* AdaptiveButton.swift */,
-				5FD58C8E2A96895900A4B084 /* CarView.swift */,
 				5FB8F2D92A9204AE00DD0B78 /* BackgroundView.swift */,
+				5FB418EB2AAE204B00B356DC /* CircularImageView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -299,12 +296,11 @@
 				5FB8F2DA2A9204AE00DD0B78 /* BackgroundView.swift in Sources */,
 				5FB418712AA8E91100B356DC /* UserSettings.swift in Sources */,
 				5FB8F2CE2A91211F00DD0B78 /* MainVC.swift in Sources */,
-				5FD58C8F2A96895900A4B084 /* CarView.swift in Sources */,
 				5FB8F2E12A95244C00DD0B78 /* Enums.swift in Sources */,
 				5FFBDC272AA0BD0F00F2946F /* SettingsVC.swift in Sources */,
 				5FB418752AA8F21600B356DC /* Data.swift in Sources */,
 				5FB8F2B02A91167000DD0B78 /* AppDelegate.swift in Sources */,
-				5FB8F2CC2A91210B00DD0B78 /* AuthorizationVC.swift in Sources */,
+				5FB418EC2AAE204B00B356DC /* CircularImageView.swift in Sources */,
 				5F9160752AA665D700658263 /* AdaptiveButton.swift in Sources */,
 				5FB8F2D02A91213D00DD0B78 /* GameVC.swift in Sources */,
 				5FB8F2B22A91167000DD0B78 /* SceneDelegate.swift in Sources */,

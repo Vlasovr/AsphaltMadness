@@ -9,8 +9,18 @@ enum Constants {
         static let hyper = 128.0
     }
     
+    enum Speed {
+        static let checkCarIsBumpedInterval = 0.1
+        static let defaultTimeInterval = 1.0
+        static let easy = 5.5
+        static let medium = 4.5
+        static let hard = 3.5
+        static let legend = 2.0
+        static let goat = 1.5
+    }
+    
     enum Game {
-        
+
         static let gameName = "AsphaltMadness"
         static let gameNameLabelWidth = 380
         static let gameNameLabelHeight = 100
@@ -24,6 +34,7 @@ enum Constants {
         static let pointLabelHeight = 40.0
         static let pointLabelWidht = 300.0
         static let curbsObjectsSide = 60.0
+        static let avatarSide = 100.0
         static let menuHeight = 250.0
         static let menuWidth = 200
         static let maxAnimationDuration = 5.5
@@ -49,12 +60,8 @@ enum Constants {
     }
     
     enum UserDefaultsKeys {
-        static let gamerName = "GamerName"
-        static let carColorIndex = "CarColor"
-        static let gameLevel = "GameLevel"
-        static let dangerObjectIndex = "DangerObjectIndex"
-        static let minimalisticDesign = "DangerObjectMinimalisticDesign"
         static let appEntries = "AppEntries"
         static let userSettingsKey = "userSettingsKey"
+        static let recordsKey = "RecordsKey"
     }
 }

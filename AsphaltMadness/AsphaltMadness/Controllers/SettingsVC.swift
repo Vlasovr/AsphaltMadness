@@ -5,7 +5,7 @@ final class SettingsVC: UIViewController {
     // MARK: - Properties
     private var selectedColorName: String?
     private var selectedLevel: Double?
-    private var selectedDangerObjectIndex: Int? = 0
+    private var selectedDangerObjectIndex: Int?
     private var isMinimalisticDesign: Bool?
     
     private lazy var gamerNameTextField: UITextField = {
@@ -18,7 +18,7 @@ final class SettingsVC: UIViewController {
     
     private lazy var avatarImage: UIImageView = {
         let avatar = UIImageView()
-        avatar.image = UIImage(systemName: "person.crop.circle.fill")
+        avatar.isUserInteractionEnabled = true
         return avatar
     }()
     
@@ -80,13 +80,20 @@ final class SettingsVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        gamerNameTextField.roundCorners()
-        setupInitialValues()
+
+        loadUserDefaults()
+        setupGestureRecogniser()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         saveUserDefaults()
+
+    }
+    override func viewDidLayoutSubviews() {
+        gamerNameTextField.roundCorners()
+        avatarImage.layer.cornerRadius = avatarImage.frame.width / 2
+        avatarImage.clipsToBounds = true
     }
     
     // MARK: - UI Setup
@@ -96,6 +103,7 @@ final class SettingsVC: UIViewController {
         navigationController?.isNavigationBarHidden = false
         addSubviews()
         setupDangerObjectPanel()
+
         //MARK: - Заглушка, пока не сделается онбординг
         //        if let entries = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.appEntries) as? Int,
         //        entries < 2 {
@@ -111,6 +119,7 @@ final class SettingsVC: UIViewController {
     
     private func addSubviews() {
         view.addSubview(gamerNameTextField)
+        view.addSubview(avatarImage)
         view.addSubview(carColorsCollectionView)
         view.addSubview(dangerObjectsPanel)
         view.addSubview(levelSegmentControl)
@@ -119,17 +128,33 @@ final class SettingsVC: UIViewController {
     
     // MARK: - User Defaults
     
-    private func setupInitialValues() {
-        guard let savedsettings = UserDefaults.standard.object(UserSettings.self,
-                                                               forKey: Constants.UserDefaultsKeys.userSettingsKey) else {
-            return
+    private func loadUserDefaults() {
+        if let savedSettings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) {
+            loadSavedSettings(savedSettings)
+        }
+    }
+    
+    private func loadSavedSettings(_ settings: UserSettings) {
+        if let savedAvatarImage = DataManager.shared.loadImage(fileName: settings.avatarImageName) {
+            avatarImage.image = savedAvatarImage
+        } else {
+            avatarImage.image = UIImage(named: "person.crop.circle.fill")
         }
         
-        levelSegmentControl.selectedSegmentIndex = Int(savedsettings.gameLevel) - 1
-        dangerDesignSegmentControl.selectedSegmentIndex = savedsettings.gameDesign ? 0 : 1
-        gamerNameTextField.text = savedsettings.userName
-        dangerObjectView.image = UIImage(named: savedsettings.dangerCarImageName)
+        gamerNameTextField.text = settings.userName
+        
+        selectedColorName = settings.carColorName
+        
+        levelSegmentControl.selectedSegmentIndex = Int(settings.gameLevel) - 1
+        selectedLevel = settings.gameLevel - 1
+        
+        dangerDesignSegmentControl.selectedSegmentIndex = settings.gameDesign ? 0 : 1
+        isMinimalisticDesign = settings.gameDesign
+        
+        dangerObjectView.image = UIImage(named: settings.dangerCarImageName)
+        selectedDangerObjectIndex = dangerObjectsList.firstIndex(where: { $0 == settings.dangerCarImageName })
     }
+
     
     private func saveUserDefaults() {
         guard let settings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) else {
@@ -137,38 +162,25 @@ final class SettingsVC: UIViewController {
             return
         }
         
-        if let userName = gamerNameTextField.text {
+        if let directoryPath = DataManager.shared.saveImage(image: avatarImage.image),
+           let userName = gamerNameTextField.text,
+           let selectedColorName = selectedColorName,
+           let selectedDangerObjectIndex = selectedDangerObjectIndex,
+           let selectedLevel = selectedLevel,
+           let isMinimalisticDesign = isMinimalisticDesign {
+            settings.avatarImageName = directoryPath
             settings.userName = userName
-        } else {
-            print("userName is nil")
-        }
-        
-        if let selectedColorName = selectedColorName {
-            settings.heroCarColorName = selectedColorName
-        } else {
-            print("selectedColorName is nil")
-        }
-        
-        if let selectedDangerObjectIndex = selectedDangerObjectIndex {
+            settings.carColorName = selectedColorName
             settings.dangerCarImageName = dangerObjectsList[selectedDangerObjectIndex]
-        } else {
-            print("selectedDangerObjectIndex is nil")
-        }
-        
-        if let selectedLevel = selectedLevel {
             settings.gameLevel = selectedLevel + 1
-        } else {
-            print("selectedLevel is nil")
-        }
-        
-        if let isMinimalisticDesign = isMinimalisticDesign {
             settings.gameDesign = isMinimalisticDesign
-        } else {
-            print("isMinimalisticDesign is nil")
         }
-        
         UserDefaults.standard.set(encodable: settings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
-
+    }
+    
+    private func setupGestureRecogniser() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(chooseNewAvatar(_:)))
+        avatarImage.addGestureRecognizer(tap)
     }
     
     // MARK: - Actions
@@ -188,20 +200,60 @@ final class SettingsVC: UIViewController {
             dangerObjectView.image = UIImage(named: dangerObjectsList[nextIndex])
         }
     }
+    
+    @objc func chooseNewAvatar(_ sender: UITapGestureRecognizer) {
+        print("Tapped")
+        showAlert(messageTitle: "ChoosePhoto", alertStyle: .actionSheet, firstButtonTitle: "Library", secondButtonTitle: "Camera", firstAlertActionStyle: .default, secondAlertActionStyle: .default, firstHandler:  {
+            self.showPicker(source: .photoLibrary)
+        }) {
+            self.showPicker(source: .camera)
+        }
+    }
 }
+
+extension SettingsVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        var chosenImage = UIImage()
+        if let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
+            chosenImage = image
+        } else if  let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            chosenImage = image
+        }
+        
+        avatarImage.image = chosenImage
+        picker.dismiss(animated: true)
+    }
+    
+    private func showPicker(source: UIImagePickerController.SourceType) {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.allowsEditing = true
+        imagePicker.sourceType = source
+        present(imagePicker, animated: true)
+    }
+}
+
 
 extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
     private func setupConstraints() {
         gamerNameTextField.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(Constants.Offsets.large)
+            make.left.equalToSuperview().inset(Constants.Offsets.big)
+            make.top.equalToSuperview().offset(Constants.Offsets.large + Constants.Offsets.big)
             make.height.equalTo(Constants.Settings.textFieldHeight)
             make.width.equalTo(Constants.Settings.textFieldWidth)
         }
         
+        avatarImage.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-Constants.Offsets.big)
+            make.top.equalToSuperview().offset(Constants.Offsets.large + Constants.Offsets.medium)
+            make.height.width.equalTo(Constants.Game.avatarSide)
+        }
+        
         carColorsCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(gamerNameTextField.snp.bottom).offset(Constants.Offsets.medium)
+            make.top.equalTo(avatarImage.snp.bottom).offset(Constants.Offsets.medium)
             make.height.equalTo(Constants.Settings.collectionViewHeight)
             make.left.equalToSuperview()
             make.right.equalToSuperview()

@@ -19,9 +19,9 @@ class MainVC: UIViewController {
         view.alpha = 0.3
         return view
     }()
-
+    
     private lazy var gameNameLabel = {
-       let label = UILabel()
+        let label = UILabel()
         label.text = "AsphaltMadness"
         label.textColor = .white
         label.font = UIFont(name: "Blazed", size: Constants.FontSizes.large)
@@ -49,7 +49,7 @@ class MainVC: UIViewController {
         button.addTarget(self, action: #selector(goToGameScreen(_:)), for: .touchUpInside)
         return button
     }()
-
+    
     
     private lazy var settingsButton = {
         let button = AdaptiveButton(title: "Settings")
@@ -85,19 +85,29 @@ class MainVC: UIViewController {
         playButton.roundCorners()
         settingsButton.roundCorners()
         recordsButton.roundCorners()
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
         setupFrames()
+        setupUI()
+    }
+    
+    private func setupUI() {
         if let userSettings = UserDefaults.standard.object(UserSettings.self,
                                                            forKey: Constants.UserDefaultsKeys.userSettingsKey) {
-            let gameLevel = userSettings.gameLevel
-            carView.backgroundColor = listOfColors[userSettings.heroCarColorName]
-            
-            self.animateRoad(backView: mainRoadView,
-                             upperView: upperRoadView,
-                             duration: gameLevel)
+            loadUserSettings(userSettings)
+        } else {
+            let defaultSettings = UserSettings(avatarImageName: "person.crop.circle.fill", userName: "Avatar", carColorName: "blue", dangerCarImageName: "redDangerObject", gameDesign: true, gameLevel: 2.0)
+            UserDefaults.standard.set(encodable: defaultSettings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
+            loadUserSettings(defaultSettings)
         }
+    }
+
+    private func loadUserSettings(_ userSettings: UserSettings) {
+        let gameLevel = userSettings.gameLevel
+        carView.backgroundColor = listOfColors[userSettings.carColorName]
+        animateRoad(backView: mainRoadView, upperView: upperRoadView, duration: gameLevel)
     }
     
     @objc func goToSettingsScreen(_ sender: UIButton) {
@@ -137,7 +147,7 @@ extension MainVC {
                                height: Constants.CarMetrics.carHeight
         )
         setupCarView(car: carView)
-
+        
         gameNameLabel.transform = CGAffineTransform(rotationAngle:
                                                         Constants.Game.gameNameLabelRotationAngle)
     }

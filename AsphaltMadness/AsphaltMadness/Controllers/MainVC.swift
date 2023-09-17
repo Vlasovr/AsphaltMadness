@@ -1,7 +1,7 @@
 import UIKit
 
-class MainVC: UIViewController {
-    
+final class MainVC: UIViewController {
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
@@ -13,15 +13,16 @@ class MainVC: UIViewController {
     
     private lazy var carView = UIView()
     
+    //MARK: - Setup menu elements
     private lazy var containerAlphaView = {
         let view = UIView()
         view.backgroundColor = .black
         view.alpha = 0.3
         return view
     }()
-
+    
     private lazy var gameNameLabel = {
-       let label = UILabel()
+        let label = UILabel()
         label.text = "AsphaltMadness"
         label.textColor = .white
         label.font = UIFont(name: "Blazed", size: Constants.FontSizes.large)
@@ -30,7 +31,6 @@ class MainVC: UIViewController {
     
     private lazy var menuView = UIView()
     
-    //MARK: - Make! goodLooking points
     private lazy var menuLabel = {
         let label = UILabel()
         label.font = UIFont(name: "Jura-Bold", size: Constants.FontSizes.hyper)
@@ -49,7 +49,7 @@ class MainVC: UIViewController {
         button.addTarget(self, action: #selector(goToGameScreen(_:)), for: .touchUpInside)
         return button
     }()
-
+    
     
     private lazy var settingsButton = {
         let button = AdaptiveButton(title: "Settings")
@@ -72,14 +72,6 @@ class MainVC: UIViewController {
         setupConstraints()
     }
     
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         playButton.roundCorners()
@@ -89,15 +81,25 @@ class MainVC: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         setupFrames()
+        setupUI()
+    }
+    
+    //MARK: Setup UI with loading user settings
+    private func setupUI() {
         if let userSettings = UserDefaults.standard.object(UserSettings.self,
                                                            forKey: Constants.UserDefaultsKeys.userSettingsKey) {
-            let gameLevel = userSettings.gameLevel
-            carView.backgroundColor = listOfColors[userSettings.heroCarColorName]
-            
-            self.animateRoad(backView: mainRoadView,
-                             upperView: upperRoadView,
-                             duration: gameLevel)
+            loadUserSettings(userSettings)
+        } else {
+            let defaultSettings = UserSettings(avatarImageName: "person.crop.circle.fill", userName: "Avatar", carColorName: "blue", dangerCarImageName: "redDangerObject", gameDesign: true, gameLevel: 2.0)
+            UserDefaults.standard.set(encodable: defaultSettings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
+            loadUserSettings(defaultSettings)
         }
+    }
+
+    private func loadUserSettings(_ userSettings: UserSettings) {
+        let gameLevel = userSettings.gameLevel
+        carView.backgroundColor = listOfColors[userSettings.carColorName]
+        animateRoad(backView: mainRoadView, upperView: upperRoadView, duration: gameLevel)
     }
     
     @objc func goToSettingsScreen(_ sender: UIButton) {
@@ -111,7 +113,6 @@ class MainVC: UIViewController {
     }
 }
 // MARK: - Setuping frames and constraintes
-
 extension MainVC {
     
     func addSubviews() {
@@ -137,7 +138,7 @@ extension MainVC {
                                height: Constants.CarMetrics.carHeight
         )
         setupCarView(car: carView)
-
+        
         gameNameLabel.transform = CGAffineTransform(rotationAngle:
                                                         Constants.Game.gameNameLabelRotationAngle)
     }

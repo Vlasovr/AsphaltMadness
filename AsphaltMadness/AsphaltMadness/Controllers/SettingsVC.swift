@@ -1,13 +1,16 @@
 import UIKit
 
+//MARK: - перестали выбираться цвета машинки
+
 final class SettingsVC: UIViewController {
     
-    // MARK: - Properties
+    // MARK: - variables to work with UI and User Defaults
     private var selectedColorName: String?
     private var selectedLevel: Double?
-    private var selectedDangerObjectIndex: Int? = 0
+    private var selectedDangerObjectIndex: Int?
     private var isMinimalisticDesign: Bool?
     
+    //MARK: - User name
     private lazy var gamerNameTextField: UITextField = {
         let textField = UITextField()
         textField.backgroundColor = .blue
@@ -16,12 +19,14 @@ final class SettingsVC: UIViewController {
         return textField
     }()
     
-    private lazy var avatarImage: UIImageView = {
-        let avatar = UIImageView()
-        avatar.image = UIImage(systemName: "person.crop.circle.fill")
+    //MARK: - Users avatar
+    private lazy var avatarImage = {
+        let avatar = CircularImageView()
+        avatar.isUserInteractionEnabled = true
         return avatar
     }()
     
+    //MARK: - Color of hero car
     private lazy var carColorsCollectionView: UICollectionView = {
         let layout = createCompositionalLayout()
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -32,6 +37,7 @@ final class SettingsVC: UIViewController {
         return cv
     }()
     
+    //MARK: - Danger objects images leaflet
     private lazy var dangerObjectView = {
         let view = UIImageView()
         if let selectedDangerObjectIndex {
@@ -51,51 +57,82 @@ final class SettingsVC: UIViewController {
     }()
     
     private lazy var nextButton: UIButton = {
-        let button = UIButton(type: .system)
+            let button = UIButton(type: .system)
         button.setBackgroundImage(UIImage(systemName: "arrowshape.right.fill"), for: .normal)
         button.addTarget(self, action: #selector(showNewImage(_:)), for: .touchUpInside)
         return button
     }()
     
+    //MARK: - Design of danger object
     private lazy var dangerDesignSegmentControl: UISegmentedControl = {
         let segmentControl = UISegmentedControl(items: ["2D", "Minimalistic"])
         segmentControl.addTarget(self, action: #selector(designSegmentDidChange(_:)), for: .valueChanged)
         return segmentControl
     }()
     
+    //MARK: - Choosing level of the game
     private lazy var levelSegmentControl: UISegmentedControl = {
         let segmentControl = UISegmentedControl(items: ["easy", "medium", "hard", "Legend", "GOAT"])
         segmentControl.addTarget(self, action: #selector(segmentDidChange(_:)), for: .valueChanged)
         return segmentControl
     }()
     
+    //MARK: - Taking colors strings from dictionary to manage them in array
     private let colorsArray = Array(listOfColors.values)
-    // MARK: - View Lifecycle
     
+    // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
+        registerForKeyboardNotifications()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        gamerNameTextField.roundCorners()
-        setupInitialValues()
+
+        loadUserDefaults()
+        setupGestureRecogniser()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         saveUserDefaults()
+
+    }
+    override func viewDidLayoutSubviews() {
+        gamerNameTextField.roundCorners()
+    }
+    
+  
+    @objc func closeSettings(_ sender: UIButton) {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func keyboardWillShow(_ notification: NSNotification) {
+        guard let userInfo = notification.userInfo,
+            let animationDuration = (userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue,
+            let keyboardScreenEndFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
+        
+        if notification.name == UIResponder.keyboardWillHideNotification {
+            gamerNameTextField.resignFirstResponder()
+        } else {
+            gamerNameTextField.becomeFirstResponder()
+        }
+
+        UIView.animate(withDuration: animationDuration) {
+            self.view.layoutIfNeeded()
+        }
     }
     
     // MARK: - UI Setup
-    
     private func setupUI() {
         view.backgroundColor = .white
         navigationController?.isNavigationBarHidden = false
+
         addSubviews()
         setupDangerObjectPanel()
+
         //MARK: - Заглушка, пока не сделается онбординг
         //        if let entries = UserDefaults.standard.object(forKey: Constants.UserDefaultsKeys.appEntries) as? Int,
         //        entries < 2 {
@@ -111,25 +148,49 @@ final class SettingsVC: UIViewController {
     
     private func addSubviews() {
         view.addSubview(gamerNameTextField)
+        view.addSubview(avatarImage)
         view.addSubview(carColorsCollectionView)
         view.addSubview(dangerObjectsPanel)
         view.addSubview(levelSegmentControl)
         view.addSubview(dangerDesignSegmentControl)
     }
     
-    // MARK: - User Defaults
     
-    private func setupInitialValues() {
-        guard let savedsettings = UserDefaults.standard.object(UserSettings.self,
-                                                               forKey: Constants.UserDefaultsKeys.userSettingsKey) else {
-            return
+    //MARK: - доделать просто открытие текстфилда
+
+    private func registerForKeyboardNotifications() {
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    // MARK: - User Defaults
+    private func loadUserDefaults() {
+        if let savedSettings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) {
+            loadSavedSettings(savedSettings)
+        }
+    }
+    
+    private func loadSavedSettings(_ settings: UserSettings) {
+        if let savedAvatarImage = DataManager.shared.loadImage(fileName: settings.avatarImageName) {
+            avatarImage.image = savedAvatarImage
+        } else {
+            avatarImage.image = UIImage(named: "person.crop.circle.fill")
         }
         
-        levelSegmentControl.selectedSegmentIndex = Int(savedsettings.gameLevel) - 1
-        dangerDesignSegmentControl.selectedSegmentIndex = savedsettings.gameDesign ? 0 : 1
-        gamerNameTextField.text = savedsettings.userName
-        dangerObjectView.image = UIImage(named: savedsettings.dangerCarImageName)
+        gamerNameTextField.text = settings.userName
+        
+        selectedColorName = settings.carColorName
+        
+        levelSegmentControl.selectedSegmentIndex = Int(settings.gameLevel) - 1
+        selectedLevel = settings.gameLevel - 1
+        
+        dangerDesignSegmentControl.selectedSegmentIndex = settings.gameDesign ? 0 : 1
+        isMinimalisticDesign = settings.gameDesign
+        
+        dangerObjectView.image = UIImage(named: settings.dangerCarImageName)
+        selectedDangerObjectIndex = dangerObjectsList.firstIndex(where: { $0 == settings.dangerCarImageName })
     }
+
     
     private func saveUserDefaults() {
         guard let settings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) else {
@@ -137,41 +198,43 @@ final class SettingsVC: UIViewController {
             return
         }
         
+        if let directoryPath = DataManager.shared.saveImage(image: avatarImage.image) {
+            settings.avatarImageName = directoryPath
+        }
         if let userName = gamerNameTextField.text {
             settings.userName = userName
-        } else {
-            print("userName is nil")
         }
         
         if let selectedColorName = selectedColorName {
-            settings.heroCarColorName = selectedColorName
-        } else {
-            print("selectedColorName is nil")
+            settings.carColorName = selectedColorName
         }
-        
         if let selectedDangerObjectIndex = selectedDangerObjectIndex {
             settings.dangerCarImageName = dangerObjectsList[selectedDangerObjectIndex]
-        } else {
-            print("selectedDangerObjectIndex is nil")
         }
-        
         if let selectedLevel = selectedLevel {
             settings.gameLevel = selectedLevel + 1
-        } else {
-            print("selectedLevel is nil")
         }
-        
         if let isMinimalisticDesign = isMinimalisticDesign {
             settings.gameDesign = isMinimalisticDesign
-        } else {
-            print("isMinimalisticDesign is nil")
         }
-        
         UserDefaults.standard.set(encodable: settings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
-
     }
     
-    // MARK: - Actions
+    //MARK: - Gesture recognisers for tapping on avatar and hiding keyboard
+    private func setupGestureRecogniser() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(chooseNewAvatar(_:)))
+        avatarImage.addGestureRecognizer(tap)
+
+        let viewTap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard(_:)))
+        view.addGestureRecognizer(viewTap)
+    
+    }
+    
+    @objc func dismissKeyboard(_ sender: UITapGestureRecognizer) {
+        view.endEditing(true)
+    }
+    
+    // MARK: - Changing user settings actions
     @objc private func segmentDidChange(_ sender: UISegmentedControl) {
         selectedLevel = Double(sender.selectedSegmentIndex)
     }
@@ -188,20 +251,66 @@ final class SettingsVC: UIViewController {
             dangerObjectView.image = UIImage(named: dangerObjectsList[nextIndex])
         }
     }
+    
+    @objc func chooseNewAvatar(_ sender: UITapGestureRecognizer) {
+        print("Tapped")
+        showAlert(messageTitle: "ChoosePhoto", alertStyle: .actionSheet, firstButtonTitle: "Library", secondButtonTitle: "Camera", firstAlertActionStyle: .default, secondAlertActionStyle: .default, firstHandler:  {
+            self.showPicker(source: .photoLibrary)
+        }) {
+            self.showPicker(source: .camera)
+        }
+    }
+}
+
+extension SettingsVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    //MARK: - Setup image picker
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        var chosenImage = UIImage()
+        if let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
+            chosenImage = image
+        } else if  let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            chosenImage = image
+        }
+        
+        avatarImage.image = chosenImage
+        picker.dismiss(animated: true)
+    }
+    
+    private func showPicker(source: UIImagePickerController.SourceType) {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.allowsEditing = true
+        imagePicker.sourceType = source
+        present(imagePicker, animated: true)
+    }
+}
+
+extension SettingsVC: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
 }
 
 extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    
+    //MARK: - Setup constraints
     private func setupConstraints() {
         gamerNameTextField.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(Constants.Offsets.large)
+            make.left.equalToSuperview().inset(Constants.Offsets.big)
+            make.top.equalToSuperview().offset(Constants.Offsets.large + Constants.Offsets.big)
             make.height.equalTo(Constants.Settings.textFieldHeight)
             make.width.equalTo(Constants.Settings.textFieldWidth)
         }
         
+        avatarImage.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-Constants.Offsets.big)
+            make.top.equalToSuperview().offset(Constants.Offsets.large + Constants.Offsets.medium)
+            make.height.width.equalTo(Constants.Game.avatarSide)
+        }
+        
         carColorsCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(gamerNameTextField.snp.bottom).offset(Constants.Offsets.medium)
+            make.top.equalTo(avatarImage.snp.bottom).offset(Constants.Offsets.medium)
             make.height.equalTo(Constants.Settings.collectionViewHeight)
             make.left.equalToSuperview()
             make.right.equalToSuperview()
@@ -258,6 +367,7 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
         }
     }
     
+    //MARK: - Setup collection
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return listOfColors.count
     }

@@ -1,6 +1,8 @@
 import UIKit
 import SnapKit
 
+//MARK: - Custom class for road setup
+
 final class BackgroundView: UIView {
     
     private lazy var asphaltView = {
@@ -140,19 +142,19 @@ final class BackgroundView: UIView {
         var isWhiteViewRight = false
         
         for y in stride(from: -objectSide, to: self.frame.height - objectSide, by: objectSide) {
-            let leftObject = createCurbsObjects(&isWhiteViewLeft)
-            let rightObject = createCurbsObjects(&isWhiteViewRight)
+            let leftRect = createCurbsObjects(&isWhiteViewLeft)
+            let rightRect = createCurbsObjects(&isWhiteViewRight)
             
-            leftCurb.addSubview(leftObject)
-            rightCurb.addSubview(rightObject)
+            leftCurb.addSubview(leftRect)
+            rightCurb.addSubview(rightRect)
             
-            setRandomXPosition(to: leftObject,
+            setRandomXPosition(to: leftRect,
                                x: leftCurb.frame.origin.x,
                                y: y,
                                width: objectSide,
                                height: objectSide)
             
-            setRandomXPosition(to: rightObject,
+            setRandomXPosition(to: rightRect,
                                x: rightCurb.frame.origin.x,
                                y: y,
                                width: objectSide,

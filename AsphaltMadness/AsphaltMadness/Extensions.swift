@@ -34,8 +34,7 @@ extension UIView {
 }
 
 extension UIViewController {
-    //MARK: - Animations block
-    
+
     func createCar(color: UIColor) -> UIView {
         let car = UIView()
         car.roundCorners()
@@ -45,6 +44,7 @@ extension UIViewController {
         return car
     }
     
+    //MARK: - Animations block
     func setupRoadFrames(mainView: BackgroundView, upperView: BackgroundView) {
         mainView.frame = CGRect(x: view.frame.origin.x,
                                 y: view.frame.origin.y,
@@ -78,7 +78,7 @@ extension UIViewController {
         }
     }
     
-    
+    //MARK: - Stop and continue the game animation
     func pauseLayer(layer: CALayer) {
         let pausedTime: CFTimeInterval = layer.convertTime(CACurrentMediaTime(), from: nil)
         layer.speed = 0.0
@@ -94,6 +94,7 @@ extension UIViewController {
         layer.beginTime = timeSincePause
     }
     
+    //MARK: - alert
     func showAlert(alertTitle: String? = nil,
                    messageTitle: String,
                    alertStyle: UIAlertController.Style,
@@ -126,6 +127,8 @@ extension UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
 }
+
+//MARK: - loading and saving custom classes in User Defauts
 
 extension UserDefaults {
     

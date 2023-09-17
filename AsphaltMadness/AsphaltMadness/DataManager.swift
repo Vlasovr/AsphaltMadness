@@ -1,5 +1,7 @@
 import UIKit
 
+//MARK: - File manager to manage images in user Avatar
+
 final class DataManager {
     
     static let shared = DataManager()

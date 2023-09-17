@@ -1,7 +1,7 @@
 import UIKit
 
 final class MainVC: UIViewController {
-    
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
@@ -13,6 +13,7 @@ final class MainVC: UIViewController {
     
     private lazy var carView = UIView()
     
+    //MARK: - Setup menu elements
     private lazy var containerAlphaView = {
         let view = UIView()
         view.backgroundColor = .black
@@ -30,7 +31,6 @@ final class MainVC: UIViewController {
     
     private lazy var menuView = UIView()
     
-    //MARK: - Make! goodLooking points
     private lazy var menuLabel = {
         let label = UILabel()
         label.font = UIFont(name: "Jura-Bold", size: Constants.FontSizes.hyper)
@@ -72,20 +72,11 @@ final class MainVC: UIViewController {
         setupConstraints()
     }
     
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-    }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         playButton.roundCorners()
         settingsButton.roundCorners()
         recordsButton.roundCorners()
-
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -93,6 +84,7 @@ final class MainVC: UIViewController {
         setupUI()
     }
     
+    //MARK: Setup UI with loading user settings
     private func setupUI() {
         if let userSettings = UserDefaults.standard.object(UserSettings.self,
                                                            forKey: Constants.UserDefaultsKeys.userSettingsKey) {
@@ -121,7 +113,6 @@ final class MainVC: UIViewController {
     }
 }
 // MARK: - Setuping frames and constraintes
-
 extension MainVC {
     
     func addSubviews() {

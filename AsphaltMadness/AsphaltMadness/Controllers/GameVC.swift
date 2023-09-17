@@ -6,7 +6,7 @@ final class GameVC: UIViewController {
         return .lightContent
     }
     
-    //MARK: - Initialize two backgrounds to manage them in animations block
+    //MARK: - Initialize two backgrounds to manage them in infinite road animation
     private lazy var mainRoadView = BackgroundView()
     
     private lazy var upperRoadView = BackgroundView()
@@ -20,20 +20,20 @@ final class GameVC: UIViewController {
     private lazy var leftButton = {
         let button = UIButton()
         button.setBackgroundImage(UIImage(systemName: "arrowshape.backward.fill"), for: .normal)
-        button.addTarget(self, action: #selector(turnDidTapped(_:)), for: .allTouchEvents)
+        button.addTarget(self, action: #selector(turnDidTapped(_:)), for: .touchUpInside)
         return button
     }()
     
     private lazy var rightButton = {
         let button = UIButton()
         button.setBackgroundImage(UIImage(systemName: "arrowshape.right.fill"), for: .normal)
-        button.addTarget(self, action: #selector(turnDidTapped(_:)), for: .allTouchEvents)
+        button.addTarget(self, action: #selector(turnDidTapped(_:)), for: .touchUpInside)
         return button
     }()
     
     private lazy var buttonsContainerView = UIView()
     
-    //MARK: - Make! goodLooking points
+    //MARK: - Game points
     private lazy var points = 0.0 {
         didSet {
             let formattedPoints = String(format: "%.3f", points)
@@ -48,7 +48,7 @@ final class GameVC: UIViewController {
         return label
     }()
 
-    //MARK: - Some counter that I would use
+    //MARK: - Count user actions for correct first movement of the hero car
     private lazy var countUserCarActions = 0 {
         didSet {
             print(countUserCarActions)
@@ -83,6 +83,7 @@ final class GameVC: UIViewController {
         }
         
         let direction = sender == leftButton ? -1.0 : 1.0
+        
         let xOffset = direction * (countUserCarActions < 2 ?
                                    carView.frame.width / 1.5 :
                                     mainRoadView.getSingleLineWidth())
@@ -98,7 +99,7 @@ final class GameVC: UIViewController {
             print("error")
         }
     }
-    
+    //MARK: - Load game settings
     private func setupGameSettings() {
         if let userSettings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) {
             let colorName = userSettings.carColorName
@@ -112,11 +113,12 @@ final class GameVC: UIViewController {
         }
     }
     
+    //MARK: - Setup danger objects with timers, could be remade for better game experience
     private func setupTimers(with userSettings: UserSettings) {
         var timeCoefficient = 1.0
         let pointsTimer = Timer.scheduledTimer(withTimeInterval: Constants.Speed.defaultTimeInterval,
                                                repeats: true) { _ in
-            self.points += (Double.random(in: (0.0...3.0) ) * timeCoefficient)
+            self.points += (Double.random(in: (.zero...Constants.Speed.defaultTimeInterval) ) * timeCoefficient)
             timeCoefficient *= 1.1
         }
         timersList.append(pointsTimer)
@@ -152,7 +154,7 @@ final class GameVC: UIViewController {
         timersList.append(rightLineDangerTimer)
     }
     
-    //MARK: - Realisation of danger objects movement with timer
+    //MARK: - Create danger objects with minimalistic design or image
     private func addDangerCars(x: CGFloat, setupWith userSettings: UserSettings) {
         userSettings.gameDesign ? createDangerImageView(x: x, userSettings: userSettings) : createDangerView(x: x, userSettings: userSettings)
     }
@@ -193,7 +195,7 @@ final class GameVC: UIViewController {
         animateDangerObject(object: car, userSettings: userSettings)
         
     }
-    
+    //MARK: - Checking is car bumped with danger objects during all the game
     private func checkCarIsBumped(object: UIView) {
         let timer = Timer.scheduledTimer(withTimeInterval: Constants.Speed.checkCarIsBumpedInterval,
                                          repeats: true) { [self] _ in
@@ -207,14 +209,13 @@ final class GameVC: UIViewController {
         }
         timersList.append(timer)
     }
-    
+    //MARK: - Checking is car intersected one of the curb during all the game
     private func isCurbesIntersect(with object: UIView) -> Bool {
         let curbFrames = mainRoadView.getCurbsFrames()
         return object.frame.intersects(curbFrames.0) || object.frame.intersects(curbFrames.1) ? (true) : (false)
     }
     
-    //MARK: - Animations Block
-    
+    //MARK: - Animations block of danger objects
     private func animateDangerObject(object: UIView, userSettings: UserSettings) {
         let carSpeed = Constants.Game.maxAnimationDuration - userSettings.gameLevel
         UIView.animate(withDuration: carSpeed, delay: .zero, options: .curveLinear) {
@@ -227,7 +228,7 @@ final class GameVC: UIViewController {
             }
         }
     }
-    
+    //MARK: - realisation of stopping the game if car is bumped or intersected
     private func stopGame() {
         countUserCarActions = 0
         pauseLayer(layer: mainRoadView.layer)
@@ -264,16 +265,20 @@ final class GameVC: UIViewController {
         
         showAlert(alertTitle: "Конец игры!", messageTitle: "Не отчаивайся, ты сможешь лучше", alertStyle: .alert, firstButtonTitle: "Ok", secondButtonTitle: "Выйти", firstAlertActionStyle: .default, secondAlertActionStyle: .cancel, firstHandler: okAction, secondHandler: cancelAction)
     }
-    
+    //MARK: - saving game record for the records table
     private func saveGamePoints(userSettings: UserSettings) {
-        let records = Records(userName: userSettings.userName, gameResult: points)
+        let currentDate = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM/yyyy HH:mm"
+        let date = dateFormatter.string(from: currentDate)
+        
+        let records = Records(userName: userSettings.userName, gameResult: points, date: date)
         UserDefaults.standard.set(encodable: records, forKey: Constants.UserDefaultsKeys.recordsKey)
     }
     
 }
 
-// MARK: - Setupping frames and constraintes
-
+// MARK: - Setupping frames and constraintes and UI
 extension GameVC {
     
     private func addSubviews() {

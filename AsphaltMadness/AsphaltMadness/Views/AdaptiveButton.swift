@@ -1,5 +1,7 @@
 import UIKit
 
+//MARK: - Custom class for animated button
+
 final class AdaptiveButton: UIButton {
     init(title: String) {
         super.init(frame: .zero)

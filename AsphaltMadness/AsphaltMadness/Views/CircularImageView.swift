@@ -1,5 +1,7 @@
 import UIKit
 
+//MARK: - Setup avatar
+
 class CircularImageView: UIImageView {
     override func layoutSubviews() {
         super.layoutSubviews()

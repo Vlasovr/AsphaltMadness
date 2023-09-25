@@ -38,13 +38,13 @@ final class MainVC: UIViewController {
             NSAttributedString.Key.foregroundColor: UIColor.blue,
             NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue
         ]
-        var attributtedString = NSMutableAttributedString(string: "Menu", attributes: attributes)
+        var attributtedString = NSMutableAttributedString(string: Constants.Game.MenuStrings.menu, attributes: attributes)
         label.attributedText = attributtedString
         return label
     }()
     
     private lazy var playButton = {
-        let button = AdaptiveButton(title: "Play")
+        let button = AdaptiveButton(title: Constants.Game.MenuStrings.play)
         button.backgroundColor = .systemBlue
         button.addTarget(self, action: #selector(goToGameScreen(_:)), for: .touchUpInside)
         return button
@@ -52,14 +52,14 @@ final class MainVC: UIViewController {
     
     
     private lazy var settingsButton = {
-        let button = AdaptiveButton(title: "Settings")
+        let button = AdaptiveButton(title: Constants.Game.MenuStrings.settings)
         button.backgroundColor = .systemBlue
         button.addTarget(self, action: #selector(goToSettingsScreen(_:)), for: .touchUpInside)
         return button
     }()
     
     private lazy var recordsButton = {
-        let button = AdaptiveButton(title: "Records")
+        let button = AdaptiveButton(title: Constants.Game.MenuStrings.records)
         button.backgroundColor = .systemBlue
         return button
     }()
@@ -90,7 +90,12 @@ final class MainVC: UIViewController {
                                                            forKey: Constants.UserDefaultsKeys.userSettingsKey) {
             loadUserSettings(userSettings)
         } else {
-            let defaultSettings = UserSettings(avatarImageName: "person.crop.circle.fill", userName: "Avatar", carColorName: "blue", dangerCarImageName: "redDangerObject", gameDesign: true, gameLevel: 2.0)
+            let defaultSettings = UserSettings(avatarImageName: Constants.Settings.Default.avatar,
+                                               userName: Constants.Settings.Default.userName,
+                                               carColorName: Constants.Settings.Default.carColorName,
+                                               dangerCarImageName: Constants.Settings.Default.dangerCarImageName,
+                                               gameDesign: Constants.Settings.Default.gameDesign,
+                                               gameLevel: Constants.Settings.Default.gameLevel)
             UserDefaults.standard.set(encodable: defaultSettings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
             loadUserSettings(defaultSettings)
         }
@@ -175,20 +180,20 @@ extension MainVC {
         playButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.centerY.equalToSuperview()
-            make.width.equalTo(Constants.Game.buttonWidth * 2)
+            make.width.equalTo(Constants.Game.playButtonWidth)
             make.height.equalTo(Constants.Game.buttonHeight)
         }
         
         settingsButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.width.equalTo(Constants.Game.buttonWidth * 1.75)
+            make.width.equalTo(Constants.Game.settingsButtonWidth)
             make.height.equalTo(Constants.Game.buttonHeight)
             make.top.equalTo(playButton.snp.bottom).offset(Constants.Offsets.medium)
         }
         
         recordsButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.width.equalTo(Constants.Game.buttonWidth * 1.5)
+            make.width.equalTo(Constants.Game.recordsButtonWidth)
             make.height.equalTo(Constants.Game.buttonHeight)
             make.top.equalTo(settingsButton.snp.bottom).offset(Constants.Offsets.medium)
         }

@@ -24,10 +24,6 @@ extension UIView {
         layer.add(animation, forKey: "wobble")
     }
     
-    func layerremoveAllAnimations() {
-        layer.removeAllAnimations()
-    }
-    
     func randomiseColor() {
         self.backgroundColor = listOfColors.values.randomElement()
     }
@@ -142,10 +138,44 @@ extension UserDefaults {
     func object<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
         if let data = object(forKey: key) as? Data,
            let value = try? JSONDecoder().decode(type, from: data) {
-            return value
             print("object read")
+            return value
         }
         return nil
     }
 }
 
+//MARK: Settings leaflet animations
+extension SettingsVC {
+    
+    func slideOutAnimation(image: UIImage, replacingImageView oldImageView: UIImageView) {
+        let newImageView = UIImageView(image: oldImageView.image)
+        newImageView.frame = oldImageView.frame
+        oldImageView.image = image
+        view.addSubview(newImageView)
+        
+        UIView.animate(withDuration: Constants.Settings.defaultSpeedAnimation, delay: 0, options: .curveLinear) {
+            newImageView.frame.origin.x -= self.view.frame.width
+        } completion: { _ in
+            newImageView.removeFromSuperview()
+        }
+    }
+    
+    func slideInAnimation(image: UIImage, replacingImageView oldImageView: UIImageView) {
+        let newImageView = UIImageView(image: image)
+        
+        newImageView.frame = CGRect(x: view.frame.width,
+                                    y: oldImageView.frame.origin.y,
+                                    width: oldImageView.frame.size.width,
+                                    height: oldImageView.frame.size.height)
+            
+        view.addSubview(newImageView)
+        
+        UIView.animate(withDuration: Constants.Settings.slideInSpeedAnimation , delay: 0, options: .curveLinear) {
+            newImageView.frame.origin.x = self.view.frame.width - newImageView.frame.width
+        }  completion: { _ in
+            oldImageView.image = image
+            newImageView.removeFromSuperview()
+        }
+    }
+}

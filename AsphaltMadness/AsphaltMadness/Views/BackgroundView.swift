@@ -7,21 +7,12 @@ final class BackgroundView: UIView {
     
     private lazy var asphaltView = {
         let asphaltView = UIView()
-        asphaltView.backgroundColor = .lightGray
+        asphaltView.backgroundColor = .systemGray4
         return asphaltView
     }()
     
-    private lazy var leftCurb = {
-        let curb = UIView()
-        curb.backgroundColor = .white
-        return curb
-    }()
-    
-    private lazy var rightCurb = {
-        let curb = UIView()
-        curb.backgroundColor = .white
-        return curb
-    }()
+    private lazy var leftCurb = UIView()
+    private lazy var rightCurb = UIView()
     
     private lazy var listOfShadingViews = [UIView]()
     
@@ -165,7 +156,7 @@ final class BackgroundView: UIView {
     private func createCurbsObjects(_ isWhite: inout Bool) -> UIImageView {
         let object = UIImageView()
         if isWhite {
-            object.backgroundColor = .red
+            object.backgroundColor = .systemRed
         } else {
             object.backgroundColor = .white
         }

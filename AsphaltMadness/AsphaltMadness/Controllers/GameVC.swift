@@ -91,7 +91,7 @@ final class GameVC: UIViewController {
         snap = UISnapBehavior(item: carView,
                               snapTo: CGPoint(x: carView.center.x + xOffset,
                                               y: carView.center.y))
-        snap?.damping = 1.1
+        snap?.damping = Constants.Game.snapDamping
         
         if let snap = snap {
             dynamicAnimator.addBehavior(snap)
@@ -119,7 +119,7 @@ final class GameVC: UIViewController {
         let pointsTimer = Timer.scheduledTimer(withTimeInterval: Constants.Speed.defaultTimeInterval,
                                                repeats: true) { _ in
             self.points += (Double.random(in: (.zero...Constants.Speed.defaultTimeInterval) ) * timeCoefficient)
-            timeCoefficient *= 1.1
+            timeCoefficient *= Constants.Game.increasingTimerCoef
         }
         timersList.append(pointsTimer)
         
@@ -241,7 +241,12 @@ final class GameVC: UIViewController {
         if let savedUserSettings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) {
             userSettings = savedUserSettings
         } else {
-            let defaultSettings = UserSettings(avatarImageName: "person.crop.circle.fill", userName: "Avatar", carColorName: "blue", dangerCarImageName: "redDangerObject", gameDesign: true, gameLevel: 2.0)
+            let defaultSettings = UserSettings(avatarImageName: Constants.Settings.Default.avatar,
+                                               userName: Constants.Settings.Default.userName,
+                                               carColorName: Constants.Settings.Default.carColorName,
+                                               dangerCarImageName: Constants.Settings.Default.dangerCarImageName,
+                                               gameDesign: Constants.Settings.Default.gameDesign,
+                                               gameLevel: Constants.Settings.Default.gameLevel)
             UserDefaults.standard.set(encodable: defaultSettings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
             userSettings = defaultSettings
         }
@@ -263,13 +268,21 @@ final class GameVC: UIViewController {
             return
         }
         
-        showAlert(alertTitle: "Конец игры!", messageTitle: "Не отчаивайся, ты сможешь лучше", alertStyle: .alert, firstButtonTitle: "Ok", secondButtonTitle: "Выйти", firstAlertActionStyle: .default, secondAlertActionStyle: .cancel, firstHandler: okAction, secondHandler: cancelAction)
+        showAlert(alertTitle: Constants.EndGameAlert.alertTitle,
+                  messageTitle: Constants.EndGameAlert.messageTitle,
+                  alertStyle: .alert,
+                  firstButtonTitle: Constants.EndGameAlert.firstButtonTitle,
+                  secondButtonTitle: Constants.EndGameAlert.secondButtonTitle,
+                  firstAlertActionStyle: .default,
+                  secondAlertActionStyle: .cancel,
+                  firstHandler: okAction,
+                  secondHandler: cancelAction)
     }
     //MARK: - saving game record for the records table
     private func saveGamePoints(userSettings: UserSettings) {
         let currentDate = Date()
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM/yyyy HH:mm"
+        dateFormatter.dateFormat = Constants.dataFormat
         let date = dateFormatter.string(from: currentDate)
         
         let records = Records(userName: userSettings.userName, gameResult: points, date: date)

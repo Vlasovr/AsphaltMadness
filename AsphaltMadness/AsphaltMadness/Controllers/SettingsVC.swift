@@ -90,30 +90,34 @@ final class SettingsVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
         loadUserDefaults()
         setupGestureRecogniser()
+    }
+    
+    override func viewDidLayoutSubviews() {
+
+        gamerNameTextField.roundCorners()
+
+        gamerNameTextField.dropShadow()
+        dangerObjectsPanel.dropShadow()
+        dangerObjectsPanel.roundCorners()
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         saveUserDefaults()
-
-    }
-    override func viewDidLayoutSubviews() {
-        gamerNameTextField.roundCorners()
     }
     
-  
     @objc func closeSettings(_ sender: UIButton) {
         navigationController?.popViewController(animated: true)
     }
     
     @objc func keyboardWillShow(_ notification: NSNotification) {
         guard let userInfo = notification.userInfo,
-            let animationDuration = (userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue,
-            let keyboardScreenEndFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
-        
+            let animationDuration = (userInfo[UIResponder.keyboardAnimationDurationUserInfoKey]
+                                     as? NSNumber)?.doubleValue else { return }
+                
         if notification.name == UIResponder.keyboardWillHideNotification {
             gamerNameTextField.resignFirstResponder()
         } else {
@@ -174,7 +178,7 @@ final class SettingsVC: UIViewController {
         if let savedAvatarImage = DataManager.shared.loadImage(fileName: settings.avatarImageName) {
             avatarImage.image = savedAvatarImage
         } else {
-            avatarImage.image = UIImage(named: "person.crop.circle.fill")
+            avatarImage.image = UIImage(named: Constants.Settings.Default.avatar)
         }
         
         gamerNameTextField.text = settings.userName
@@ -243,15 +247,6 @@ final class SettingsVC: UIViewController {
         isMinimalisticDesign = sender.selectedSegmentIndex == 0
     }
     
-    @objc func showNewImage(_ sender: UIButton) {
-        let direction = sender == backButton ? -1 : 1
-        if let currentIndex = selectedDangerObjectIndex {
-            let nextIndex = (currentIndex + direction + dangerObjectsList.count) % dangerObjectsList.count
-            selectedDangerObjectIndex = nextIndex
-            dangerObjectView.image = UIImage(named: dangerObjectsList[nextIndex])
-        }
-    }
-    
     @objc func chooseNewAvatar(_ sender: UITapGestureRecognizer) {
         print("Tapped")
         showAlert(messageTitle: "ChoosePhoto", alertStyle: .actionSheet, firstButtonTitle: "Library", secondButtonTitle: "Camera", firstAlertActionStyle: .default, secondAlertActionStyle: .default, firstHandler:  {
@@ -260,6 +255,24 @@ final class SettingsVC: UIViewController {
             self.showPicker(source: .camera)
         }
     }
+    
+    //MARK: Leaflet with animation
+    @objc func showNewImage(_ sender: UIButton) {
+        let isSenderBackButton = sender == backButton
+        let direction =  isSenderBackButton ? -1 : 1
+        if let currentIndex = selectedDangerObjectIndex {
+            let nextIndex = (currentIndex + direction + dangerObjectsList.count) % dangerObjectsList.count
+            selectedDangerObjectIndex = nextIndex
+            if let image =  UIImage(named:dangerObjectsList[nextIndex]) {
+                if isSenderBackButton {
+                    slideOutAnimation(image: image, replacingImageView: dangerObjectView)
+                } else {
+                    slideInAnimation(image: image, replacingImageView: dangerObjectView)
+                }
+            }
+        }
+    }
+   
 }
 
 extension SettingsVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -326,7 +339,6 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
         dangerDesignSegmentControl.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(dangerObjectsPanel.snp.bottom).offset(Constants.Offsets.medium)
-            
         }
         
         levelSegmentControl.snp.makeConstraints { make in
@@ -338,31 +350,25 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
     }
     
     private func setupDangerObjectPanel() {
-        dangerObjectsPanel.addSubview(dangerObjectView)
+        view.addSubview(dangerObjectView)
         dangerObjectsPanel.addSubview(backButton)
         dangerObjectsPanel.addSubview(nextButton)
         dangerObjectsPanel.backgroundColor = .secondarySystemBackground
-        dangerObjectsPanel.roundCorners()
         
-        dangerObjectView.roundCorners()
-        dangerObjectView.clipsToBounds = true
-        
-        dangerObjectView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(Constants.Offsets.small)
-            make.height.equalTo(Constants.CarMetrics.carHeight * 1.8)
-            make.width.equalTo(Constants.CarMetrics.carWidth * 2)
-        }
+        dangerObjectView.center.x = view.center.x - Constants.CarMetrics.settingsDangerObjectWidth / 2
+        dangerObjectView.center.y = view.center.y
+        dangerObjectView.frame.size = CGSize(width: Constants.CarMetrics.settingsDangerObjectWidth,
+                                        height: Constants.CarMetrics.settingsDangerObjectHeight)
         
         backButton.snp.makeConstraints { make in
             make.leading.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-20)
+            make.bottom.equalToSuperview().offset(-Constants.Offsets.big)
             make.width.height.equalTo(Constants.Game.buttonWidth)
         }
         
         nextButton.snp.makeConstraints { make in
             make.trailing.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-20)
+            make.bottom.equalToSuperview().offset(-Constants.Offsets.big)
             make.width.height.equalTo(Constants.Game.buttonWidth)
         }
     }

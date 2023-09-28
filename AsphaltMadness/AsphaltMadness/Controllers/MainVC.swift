@@ -17,15 +17,15 @@ final class MainVC: UIViewController {
     private lazy var containerAlphaView = {
         let view = UIView()
         view.backgroundColor = .black
-        view.alpha = 0.3
+        view.alpha = Constants.Game.containerViewAlpha
         return view
     }()
     
     private lazy var gameNameLabel = {
         let label = UILabel()
-        label.text = "AsphaltMadness"
+        label.text = Constants.Game.gameName
         label.textColor = .white
-        label.font = UIFont(name: "Blazed", size: Constants.FontSizes.large)
+        label.font = UIFont(name: Constants.Font.blazed, size: Constants.FontSizes.large)
         return label
     }()
     
@@ -33,7 +33,7 @@ final class MainVC: UIViewController {
     
     private lazy var menuLabel = {
         let label = UILabel()
-        label.font = UIFont(name: "Jura-Bold", size: Constants.FontSizes.hyper)
+        label.font = UIFont(name: Constants.Font.juraBold, size: Constants.FontSizes.hyper)
         let attributes: [NSAttributedString.Key: Any] = [
             NSAttributedString.Key.foregroundColor: UIColor.blue,
             NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue
@@ -50,7 +50,6 @@ final class MainVC: UIViewController {
         return button
     }()
     
-    
     private lazy var settingsButton = {
         let button = AdaptiveButton(title: Constants.Game.MenuStrings.settings)
         button.backgroundColor = .systemBlue
@@ -61,6 +60,7 @@ final class MainVC: UIViewController {
     private lazy var recordsButton = {
         let button = AdaptiveButton(title: Constants.Game.MenuStrings.records)
         button.backgroundColor = .systemBlue
+        button.addTarget(self, action: #selector(goToRecordsScreen(_:)), for: .touchUpInside)
         return button
     }()
     
@@ -84,27 +84,9 @@ final class MainVC: UIViewController {
         setupUI()
     }
     
-    //MARK: Setup UI with loading user settings
-    private func setupUI() {
-        if let userSettings = UserDefaults.standard.object(UserSettings.self,
-                                                           forKey: Constants.UserDefaultsKeys.userSettingsKey) {
-            loadUserSettings(userSettings)
-        } else {
-            let defaultSettings = UserSettings(avatarImageName: Constants.Settings.Default.avatar,
-                                               userName: Constants.Settings.Default.userName,
-                                               carColorName: Constants.Settings.Default.carColorName,
-                                               dangerCarImageName: Constants.Settings.Default.dangerCarImageName,
-                                               gameDesign: Constants.Settings.Default.gameDesign,
-                                               gameLevel: Constants.Settings.Default.gameLevel)
-            UserDefaults.standard.set(encodable: defaultSettings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
-            loadUserSettings(defaultSettings)
-        }
-    }
-
-    private func loadUserSettings(_ userSettings: UserSettings) {
-        let gameLevel = userSettings.gameLevel
-        carView.backgroundColor = listOfColors[userSettings.carColorName]
-        animateRoad(backView: mainRoadView, upperView: upperRoadView, duration: gameLevel)
+    @objc func goToRecordsScreen(_ sender: UIButton) {
+        let recordsController = RecordsVC()
+        navigationController?.pushViewController(recordsController, animated: true)
     }
     
     @objc func goToSettingsScreen(_ sender: UIButton) {
@@ -116,7 +98,30 @@ final class MainVC: UIViewController {
         let gameController = GameVC()
         navigationController?.pushViewController(gameController, animated: true)
     }
+    
+    //MARK: Setup UI with loading user settings
+    private func setupUI() {
+        if let userSettings = UserDefaults.standard.object(UserSettings.self,
+                                                           forKey: Constants.UserDefaultsKeys.userSettingsKey) {
+            loadUserSettings(userSettings)
+        } else {
+            //First app entry
+            let defaultSettings = Constants.Settings.defaultSettings
+            UserDefaults.standard.set(encodable: defaultSettings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
+            loadUserSettings(defaultSettings)
+            
+            let records = [Records]()
+            UserDefaults.standard.set(encodable: records, forKey: Constants.UserDefaultsKeys.recordsKey)
+        }
+    }
+    
+    private func loadUserSettings(_ userSettings: UserSettings) {
+        let gameLevel = userSettings.gameLevel
+        carView.backgroundColor = listOfColors[userSettings.carColorName]
+        animateRoad(backView: mainRoadView, upperView: upperRoadView, duration: gameLevel)
+    }
 }
+
 // MARK: - Setuping frames and constraintes
 extension MainVC {
     
@@ -138,7 +143,7 @@ extension MainVC {
         setupRoadFrames(mainView: mainRoadView, upperView: upperRoadView)
         
         carView.frame = CGRect(x: view.center.x - Constants.CarMetrics.carWidth / 2,
-                               y: view.frame.height - Constants.Offsets.hyper - Constants.CarMetrics.carHeight,
+                               y: menuView.frame.maxY + Constants.Offsets.big,
                                width: Constants.CarMetrics.carWidth,
                                height: Constants.CarMetrics.carHeight
         )
@@ -161,7 +166,7 @@ extension MainVC {
         
         gameNameLabel.snp.makeConstraints { make in
             make.left.equalTo(Constants.Offsets.small)
-            make.top.equalToSuperview().offset(Constants.Offsets.hyper)
+            make.top.equalToSuperview().offset(Constants.Offsets.large + Constants.Offsets.big)
             make.height.equalTo(Constants.Game.gameNameLabelHeight)
             make.width.equalTo(Constants.Game.gameNameLabelWidth)
         }

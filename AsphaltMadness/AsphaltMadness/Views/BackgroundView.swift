@@ -17,7 +17,7 @@ final class BackgroundView: UIView {
     private lazy var listOfShadingViews = [UIView]()
     
     lazy var getSingleLineWidth = {
-        return self.asphaltView.frame.width / 4
+        return self.asphaltView.frame.width / Constants.Game.stripesCount
     }
     
     override init(frame: CGRect) {
@@ -45,7 +45,7 @@ final class BackgroundView: UIView {
         leftCurb.snp.makeConstraints { make in
             make.left.equalToSuperview()
             make.top.equalToSuperview()
-            make.bottom.equalToSuperview().offset(5)
+            make.bottom.equalToSuperview().offset(Constants.Offsets.little)
             make.width.equalTo(Constants.Game.spacingForCurbs)
         }
         
@@ -53,7 +53,7 @@ final class BackgroundView: UIView {
         rightCurb.snp.makeConstraints { make in
             make.right.equalToSuperview()
             make.top.equalToSuperview()
-            make.bottom.equalToSuperview().offset(5)
+            make.bottom.equalToSuperview().offset(Constants.Offsets.little)
             make.width.equalTo(Constants.Game.spacingForCurbs)
         }
         self.addSubview(asphaltView)
@@ -62,15 +62,15 @@ final class BackgroundView: UIView {
             make.left.equalTo(leftCurb.snp.right)
             make.right.equalTo(rightCurb.snp.left)
             make.top.equalToSuperview()
-            make.bottom.equalToSuperview().offset(5)
+            make.bottom.equalToSuperview().offset(Constants.Offsets.little)
         }
         
         setupShadeViews()
     }
     
     private func setupShadeViews() {
-        let shadesWidth = 5.0
-        let spacingFactor: CGFloat = 0.5
+        let shadesWidth = Constants.Game.shadesWidth
+        let spacingFactor = Constants.Game.spacingFactor
         
         let centeredShadesView = UIView()
         asphaltView.addSubview(centeredShadesView)
@@ -108,13 +108,13 @@ final class BackgroundView: UIView {
     
     private func setupShading() {
         let totalRoadLength = self.frame.height
-        let numberOfStripes: CGFloat = 10
+        let numberOfStripes: CGFloat = Constants.Game.numberOfStripes
         let stripesLength = totalRoadLength / (numberOfStripes * 1.5)
         listOfShadingViews.forEach { shadeView in
             
             for y in stride(from: stripesLength / 4, to: self.frame.height - stripesLength / 4,
                             by: 1.5 * stripesLength) {
-                createShade(x: 0, y: y, shadesWidth: shadeView.frame.width, shadesHeight: stripesLength, superView: shadeView)
+                createShade(x: .zero, y: y, shadesWidth: shadeView.frame.width, shadesHeight: stripesLength, superView: shadeView)
             }
         }
     }

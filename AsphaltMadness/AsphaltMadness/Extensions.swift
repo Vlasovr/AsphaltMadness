@@ -2,26 +2,29 @@ import UIKit
 
 extension UIView {
     
-    func roundCorners(radius: CGFloat = 10) {
+    func roundCorners(radius: CGFloat = Constants.radiusOfRoundCorner) {
         return self.layer.cornerRadius = radius
     }
     
     func dropShadow() {
         layer.masksToBounds = false
         layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.7
-        layer.shadowOffset = CGSize(width: 10, height: 10)
-        layer.shadowRadius = 9
+        layer.shadowOpacity = Constants.shadowOpasity
+        layer.shadowOffset = CGSize(width: Constants.radiusOfRoundCorner,
+                                    height: Constants.radiusOfRoundCorner)
+        layer.shadowRadius = Constants.radiusOfRoundCorner
         layer.shadowPath = UIBezierPath(rect: bounds).cgPath
     }
     
     func wobble(duration: CFTimeInterval = .infinity) {
-        let animation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
+        let animation = Constants.WobbleSettings.animationsFrame
         animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
-        animation.duration = 0.2
-        animation.values = [0.015, 0.02, 0]
+        animation.duration = Constants.WobbleSettings.duration
+        animation.values = [Constants.WobbleSettings.firstValue,
+                            Constants.WobbleSettings.secondValue,
+                            Constants.WobbleSettings.thirdValue]
         animation.repeatDuration = duration
-        layer.add(animation, forKey: "wobble")
+        layer.add(animation, forKey: Constants.WobbleSettings.key)
     }
     
     func randomiseColor() {
@@ -45,7 +48,8 @@ extension UIViewController {
         mainView.frame = CGRect(x: view.frame.origin.x,
                                 y: view.frame.origin.y,
                                 width: view.frame.width,
-                                height: view.frame.height)
+                                height: view.frame.height
+        )
         
         mainView.setupSubviews()
         
@@ -57,18 +61,17 @@ extension UIViewController {
         )
         
         upperView.setupSubviews()
-        
     }
     
     func animateRoad(backView: UIView, upperView: UIView, duration: Double) {
-        guard duration > 0 else { return }
+        guard duration > .zero else { return }
         
         let animationOptions: UIView.AnimationOptions = [.repeat, .curveLinear]
         let distanceToMove = backView.frame.size.height
         
         let animationDuration = Constants.Game.maxAnimationDuration - duration
         
-        UIView.animate(withDuration: animationDuration, delay: 0, options: animationOptions) {
+        UIView.animate(withDuration: animationDuration, delay: .zero, options: animationOptions) {
             backView.frame.origin.y += distanceToMove
             upperView.frame.origin.y += distanceToMove
         }
@@ -77,15 +80,15 @@ extension UIViewController {
     //MARK: - Stop and continue the game animation
     func pauseLayer(layer: CALayer) {
         let pausedTime: CFTimeInterval = layer.convertTime(CACurrentMediaTime(), from: nil)
-        layer.speed = 0.0
+        layer.speed = .zero
         layer.timeOffset = pausedTime
     }
     
     func resumeLayer(layer: CALayer) {
         let pausedTime: CFTimeInterval = layer.timeOffset
         layer.speed = 1.0
-        layer.timeOffset = 0.0
-        layer.beginTime = 0.0
+        layer.timeOffset = .zero
+        layer.beginTime = .zero
         let timeSincePause: CFTimeInterval = layer.convertTime(CACurrentMediaTime(), from: nil) - pausedTime
         layer.beginTime = timeSincePause
     }
@@ -109,6 +112,7 @@ extension UIViewController {
                                                    style: firstAlertActionStyle) { _ in
             firstHandler?()
         }
+        
         alert.addAction(firstAlertActionButton)
         
         if let secondButtonTitle = secondButtonTitle,
@@ -117,28 +121,33 @@ extension UIViewController {
                                                         style: secondAlertActionStyle) { _ in
                 secondHandler?()
             }
+            
             alert.addAction(secondAlertActionButton)
         }
         
         self.present(alert, animated: true, completion: nil)
     }
+    
+    func getDate() -> String {
+        let currentDate = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = Constants.dataFormat
+        return dateFormatter.string(from: currentDate)
+    }
 }
 
 //MARK: - loading and saving custom classes in User Defauts
-
 extension UserDefaults {
     
     func set<T: Encodable>(encodable: T, forKey key: String) {
         if let data = try? JSONEncoder().encode(encodable) {
             set(data, forKey: key)
-            print("object loaded")
         }
     }
     
     func object<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
         if let data = object(forKey: key) as? Data,
            let value = try? JSONDecoder().decode(type, from: data) {
-            print("object read")
             return value
         }
         return nil
@@ -154,8 +163,10 @@ extension SettingsVC {
         oldImageView.image = image
         view.addSubview(newImageView)
         
-        UIView.animate(withDuration: Constants.Settings.defaultSpeedAnimation, delay: 0, options: .curveLinear) {
-            newImageView.frame.origin.x -= self.view.frame.width
+        UIView.animate(withDuration: Constants.Settings.defaultSpeedAnimation, 
+                       delay: .zero,
+                       options: .curveLinear) { [weak self] in
+            newImageView.frame.origin.x -= self?.view.frame.width ?? .zero
         } completion: { _ in
             newImageView.removeFromSuperview()
         }
@@ -171,8 +182,10 @@ extension SettingsVC {
             
         view.addSubview(newImageView)
         
-        UIView.animate(withDuration: Constants.Settings.slideInSpeedAnimation , delay: 0, options: .curveLinear) {
-            newImageView.frame.origin.x = self.view.frame.width - newImageView.frame.width
+        UIView.animate(withDuration: Constants.Settings.slideInSpeedAnimation ,
+                       delay: .zero,
+                       options: .curveLinear) { [weak self] in
+            newImageView.frame.origin.x = self?.view.frame.width ?? .zero - newImageView.frame.width
         }  completion: { _ in
             oldImageView.image = image
             newImageView.removeFromSuperview()

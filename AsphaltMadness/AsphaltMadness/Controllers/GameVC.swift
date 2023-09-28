@@ -19,14 +19,14 @@ final class GameVC: UIViewController {
     
     private lazy var leftButton = {
         let button = UIButton()
-        button.setBackgroundImage(UIImage(systemName: "arrowshape.backward.fill"), for: .normal)
+        button.setBackgroundImage(UIImage(systemName: Constants.ButtonNames.leftSquareButton), for: .normal)
         button.addTarget(self, action: #selector(turnDidTapped(_:)), for: .touchUpInside)
         return button
     }()
     
     private lazy var rightButton = {
         let button = UIButton()
-        button.setBackgroundImage(UIImage(systemName: "arrowshape.right.fill"), for: .normal)
+        button.setBackgroundImage(UIImage(systemName: Constants.ButtonNames.rightSquareButton), for: .normal)
         button.addTarget(self, action: #selector(turnDidTapped(_:)), for: .touchUpInside)
         return button
     }()
@@ -34,20 +34,20 @@ final class GameVC: UIViewController {
     private lazy var buttonsContainerView = UIView()
     
     //MARK: - Game points
-    private lazy var points = 0.0 {
+    private lazy var points = Constants.Game.defaultPoints {
         didSet {
-            let formattedPoints = String(format: "%.3f", points)
-            pointsLabel.text = "Points: " + formattedPoints
+            let formattedPoints = String(format: Constants.RecordsScreen.pointsFormat, points)
+            pointsLabel.text = Constants.RecordsScreen.points + formattedPoints
         }
     }
     
     private lazy var pointsLabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.font = UIFont(name: "Jura-Bold", size: Constants.FontSizes.medium)
+        label.font = UIFont(name: Constants.Font.juraBold, size: Constants.FontSizes.medium)
         return label
     }()
-
+    
     //MARK: - Count user actions for correct first movement of the hero car
     private lazy var countUserCarActions = 0 {
         didSet {
@@ -73,7 +73,7 @@ final class GameVC: UIViewController {
         setupCarView(car: carView)
         setupGameSettings()
     }
-  
+    
     // MARK: - Touch events control
     @objc func turnDidTapped(_ sender: UIButton) {
         countUserCarActions += 1
@@ -95,8 +95,6 @@ final class GameVC: UIViewController {
         
         if let snap = snap {
             dynamicAnimator.addBehavior(snap)
-        } else {
-            print("error")
         }
     }
     //MARK: - Load game settings
@@ -107,15 +105,15 @@ final class GameVC: UIViewController {
             carView.backgroundColor = listOfColors[colorName]
             
             self.animateRoad(backView: mainRoadView,
-                            upperView: upperRoadView,
-                            duration: gameLevel)
+                             upperView: upperRoadView,
+                             duration: gameLevel)
             setupTimers(with: userSettings)
         }
     }
     
     //MARK: - Setup danger objects with timers, could be remade for better game experience
     private func setupTimers(with userSettings: UserSettings) {
-        var timeCoefficient = 1.0
+        var timeCoefficient = Constants.Game.timeCoefficient
         let pointsTimer = Timer.scheduledTimer(withTimeInterval: Constants.Speed.defaultTimeInterval,
                                                repeats: true) { _ in
             self.points += (Double.random(in: (.zero...Constants.Speed.defaultTimeInterval) ) * timeCoefficient)
@@ -173,9 +171,9 @@ final class GameVC: UIViewController {
         view.addSubview(dangerView)
         
         dangerView.frame = CGRect( x: x,
-                    y: -Constants.CarMetrics.carHeight - view.safeAreaInsets.top,
-                    width: Constants.CarMetrics.carWidth,
-                    height: Constants.CarMetrics.carHeight)
+                                   y: -Constants.CarMetrics.carHeight - view.safeAreaInsets.top,
+                                   width: Constants.CarMetrics.carWidth,
+                                   height: Constants.CarMetrics.carHeight)
         
         listOfСars.append(dangerView)
         animateDangerObject(object: dangerView, userSettings: userSettings)
@@ -186,9 +184,9 @@ final class GameVC: UIViewController {
         
         view.addSubview(car)
         let carFrame = CGRect(x: x,
-                    y: -Constants.CarMetrics.carHeight - view.safeAreaInsets.top,
-                    width: Constants.CarMetrics.carWidth,
-                    height: Constants.CarMetrics.carHeight)
+                              y: -Constants.CarMetrics.carHeight - view.safeAreaInsets.top,
+                              width: Constants.CarMetrics.carWidth,
+                              height: Constants.CarMetrics.carHeight)
         
         setupCarView(car: car, frame: carFrame)
         listOfСars.append(car)
@@ -198,12 +196,12 @@ final class GameVC: UIViewController {
     //MARK: - Checking is car bumped with danger objects during all the game
     private func checkCarIsBumped(object: UIView) {
         let timer = Timer.scheduledTimer(withTimeInterval: Constants.Speed.checkCarIsBumpedInterval,
-                                         repeats: true) { [self] _ in
+                                         repeats: true) { _ in
             if let objectFrame = object.layer.presentation()?.frame {
-                if carView.frame.intersects(objectFrame) || isCurbesIntersect(with: carView) {
+                if self.carView.frame.intersects(objectFrame) || self.isCurbesIntersect(with: self.carView) {
                     object.removeFromSuperview()
-                    carView.removeFromSuperview()
-                    stopGame()
+                    self.carView.removeFromSuperview()
+                    self.manageCrushedCar()
                 }
             }
         }
@@ -229,42 +227,29 @@ final class GameVC: UIViewController {
         }
     }
     //MARK: - realisation of stopping the game if car is bumped or intersected
-    private func stopGame() {
-        countUserCarActions = 0
-        pauseLayer(layer: mainRoadView.layer)
-        pauseLayer(layer: upperRoadView.layer)
-        timersList.forEach { $0.invalidate() }
-        timersList.removeAll()
+    private func manageCrushedCar() {
+        
+        stopGame()
         
         let userSettings: UserSettings
         
         if let savedUserSettings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) {
             userSettings = savedUserSettings
         } else {
-            let defaultSettings = UserSettings(avatarImageName: Constants.Settings.Default.avatar,
-                                               userName: Constants.Settings.Default.userName,
-                                               carColorName: Constants.Settings.Default.carColorName,
-                                               dangerCarImageName: Constants.Settings.Default.dangerCarImageName,
-                                               gameDesign: Constants.Settings.Default.gameDesign,
-                                               gameLevel: Constants.Settings.Default.gameLevel)
+            let defaultSettings = Constants.Settings.defaultSettings
             UserDefaults.standard.set(encodable: defaultSettings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
             userSettings = defaultSettings
         }
         
         saveGamePoints(userSettings: userSettings)
         
-        let okAction = { [userSettings] in
-            self.setupTimers(with: userSettings)
-
-            self.points = 0
-            self.view.addSubview(self.carView)
-            self.setupCarView(car: self.carView)
-            self.resumeLayer(layer: self.mainRoadView.layer)
-            self.resumeLayer(layer: self.upperRoadView.layer)
+        let okAction = { [weak self, userSettings] in
+            self?.restartGame(with: userSettings)
+            return
         }
         
-        let cancelAction = {
-            self.navigationController?.popViewController(animated: true)
+        let cancelAction = { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
             return
         }
         
@@ -278,17 +263,43 @@ final class GameVC: UIViewController {
                   firstHandler: okAction,
                   secondHandler: cancelAction)
     }
-    //MARK: - saving game record for the records table
-    private func saveGamePoints(userSettings: UserSettings) {
-        let currentDate = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = Constants.dataFormat
-        let date = dateFormatter.string(from: currentDate)
-        
-        let records = Records(userName: userSettings.userName, gameResult: points, date: date)
-        UserDefaults.standard.set(encodable: records, forKey: Constants.UserDefaultsKeys.recordsKey)
+    
+    private func stopGame() {
+        countUserCarActions = .zero
+        pauseLayer(layer: mainRoadView.layer)
+        pauseLayer(layer: upperRoadView.layer)
+        timersList.forEach { $0.invalidate() }
+        timersList.removeAll()
     }
     
+    private func restartGame(with userSettings: UserSettings) {
+        self.setupTimers(with: userSettings)
+        self.points = .zero
+        self.view.addSubview(self.carView)
+        self.setupCarView(car: self.carView)
+        self.resumeLayer(layer: self.mainRoadView.layer)
+        self.resumeLayer(layer: self.upperRoadView.layer)
+    }
+    
+    //MARK: - saving game record for the records table
+    private func saveGamePoints(userSettings: UserSettings) {
+        guard var recordsHistory = UserDefaults.standard.object([Records].self,
+                                                                forKey: Constants.UserDefaultsKeys.recordsKey) else {
+            return
+        }
+        
+        if let lastRecord = recordsHistory.last,
+                lastRecord.gameResult >= points {
+            return
+        }
+        
+        let date = getDate()
+        let record = Records(userName: userSettings.userName, avatarImageName: userSettings.avatarImageName, gameResult: points, date: date)
+        
+        recordsHistory.append(record)
+        UserDefaults.standard.set(encodable: recordsHistory, forKey: Constants.UserDefaultsKeys.recordsKey)
+        
+    }
 }
 
 // MARK: - Setupping frames and constraintes and UI
@@ -309,10 +320,10 @@ extension GameVC {
     }
     
     private func setupCarView(car: UIView) {
-        car.frame = CGRect(x: view.center.x - Constants.CarMetrics.carWidth / 2,
-                               y: view.frame.height - Constants.Offsets.hyper - Constants.CarMetrics.carHeight,
-                               width: Constants.CarMetrics.carWidth,
-                               height: Constants.CarMetrics.carHeight)
+        car.frame = CGRect(x: view.center.x - Constants.CarMetrics.halfCarWidth,
+                           y: view.frame.height - Constants.Offsets.hyper - Constants.CarMetrics.carHeight,
+                           width: Constants.CarMetrics.carWidth,
+                           height: Constants.CarMetrics.carHeight)
         car.roundCorners()
         car.dropShadow()
         car.wobble()
@@ -332,7 +343,7 @@ extension GameVC {
             make.centerX.equalToSuperview()
             make.top.equalTo(view.snp.bottom).offset(-Constants.Offsets.large)
             make.height.equalTo(Constants.Game.buttonHeight)
-            make.width.equalTo(Constants.Game.buttonWidth * 3)
+            make.width.equalTo(Constants.Game.buttonContainerViewWidth)
         }
         
         leftButton.snp.makeConstraints { make in

@@ -25,14 +25,19 @@ final class AdaptiveButton: UIButton {
     }
     
     @objc func touchDown() {
-        UIView.animate(withDuration: 0.3, delay: 0, options: [.allowUserInteraction, .beginFromCurrentState]) {
-            self.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        UIView.animate(withDuration: Constants.Settings.defaultSpeedAnimation,
+                       delay: .zero,
+                       options: [.allowUserInteraction, .beginFromCurrentState]) { [weak self] in
+            self?.transform = CGAffineTransform(scaleX: Constants.buttonsScaleFactor, 
+                                                y: Constants.buttonsScaleFactor)
         }
     }
     
     @objc func touchUpInside() {
-        UIView.animate(withDuration: 0.3, delay: 0, options: [.allowUserInteraction, .beginFromCurrentState]) {
-            self.transform = .identity
+        UIView.animate(withDuration: Constants.Settings.defaultSpeedAnimation,
+                       delay: .zero,
+                       options: [.allowUserInteraction, .beginFromCurrentState]) { [weak self] in
+            self?.transform = .identity
         }
     }
 

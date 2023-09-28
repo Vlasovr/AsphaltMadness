@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		22E9894D2FEDDDD69C1C9C2D /* Pods_AsphaltMadness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F07F57A60714F853FAEAA9 /* Pods_AsphaltMadness.framework */; };
+		5F45E0052AC49776005836BD /* RecordsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F45E0042AC49776005836BD /* RecordsVC.swift */; };
+		5F45E0072AC4AB50005836BD /* RecordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F45E0062AC4AB50005836BD /* RecordTableViewCell.swift */; };
 		5F570CC02A97CB0B00DA3E9C /* Jura-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5F570CBF2A97CB0B00DA3E9C /* Jura-Bold.ttf */; };
 		5F9160752AA665D700658263 /* AdaptiveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F9160742AA665D700658263 /* AdaptiveButton.swift */; };
 		5FB418612AA7800C00B356DC /* Blazed.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5FB418602AA77FDD00B356DC /* Blazed.ttf */; };
@@ -30,6 +32,8 @@
 
 /* Begin PBXFileReference section */
 		54F07F57A60714F853FAEAA9 /* Pods_AsphaltMadness.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AsphaltMadness.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F45E0042AC49776005836BD /* RecordsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsVC.swift; sourceTree = "<group>"; };
+		5F45E0062AC4AB50005836BD /* RecordTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
 		5F570CBF2A97CB0B00DA3E9C /* Jura-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Jura-Bold.ttf"; sourceTree = "<group>"; };
 		5F9160742AA665D700658263 /* AdaptiveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveButton.swift; sourceTree = "<group>"; };
 		5FB418602AA77FDD00B356DC /* Blazed.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Blazed.ttf; sourceTree = "<group>"; };
@@ -141,6 +145,8 @@
 			children = (
 				5FB8F2CD2A91211F00DD0B78 /* MainVC.swift */,
 				5FFBDC262AA0BD0F00F2946F /* SettingsVC.swift */,
+				5F45E0042AC49776005836BD /* RecordsVC.swift */,
+				5F45E0062AC4AB50005836BD /* RecordTableViewCell.swift */,
 				5FB8F2CF2A91213D00DD0B78 /* GameVC.swift */,
 				5FB8F2BA2A91167100DD0B78 /* LaunchScreen.storyboard */,
 			);
@@ -297,9 +303,11 @@
 				5FB418712AA8E91100B356DC /* UserSettings.swift in Sources */,
 				5FB8F2CE2A91211F00DD0B78 /* MainVC.swift in Sources */,
 				5FB8F2E12A95244C00DD0B78 /* Enums.swift in Sources */,
+				5F45E0072AC4AB50005836BD /* RecordTableViewCell.swift in Sources */,
 				5FFBDC272AA0BD0F00F2946F /* SettingsVC.swift in Sources */,
 				5FB418752AA8F21600B356DC /* Data.swift in Sources */,
 				5FB8F2B02A91167000DD0B78 /* AppDelegate.swift in Sources */,
+				5F45E0052AC49776005836BD /* RecordsVC.swift in Sources */,
 				5FB418EC2AAE204B00B356DC /* CircularImageView.swift in Sources */,
 				5F9160752AA665D700658263 /* AdaptiveButton.swift in Sources */,
 				5FB8F2D02A91213D00DD0B78 /* GameVC.swift in Sources */,
@@ -449,8 +457,7 @@
 				INFOPLIST_FILE = AsphaltMadness/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -481,8 +488,7 @@
 				INFOPLIST_FILE = AsphaltMadness/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

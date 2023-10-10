@@ -31,3 +31,7 @@ xcuserdata
 **/fastlane/Preview.html
 **/fastlane/screenshots
 **/fastlane/test_output
+AsphaltMadness.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+AsphaltMadness.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+AsphaltMadness.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+AsphaltMadness.xcworkspace/contents.xcworkspacedata

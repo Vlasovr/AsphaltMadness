@@ -86,6 +86,8 @@ enum Constants {
         static let increasingTimerCoef = 1.1
         static let snapDamping = 1.1
         static let containerViewAlpha = 0.5
+        static let gyroUpdateInterval = 0.01
+        static let movingCoefficient = 0.005
         
         enum MenuStrings {
             static let menu = "Menu"
@@ -115,10 +117,12 @@ enum Constants {
         static let cellIdentifier = "cell"
         static let levelSegmentControlItems = ["easy", "medium", "hard", "Legend", "GOAT"]
         static let designSegmentControlItems = ["2D", "Minimalistic"]
+        static let raceSegmentControlItems = ["Buttons", "Accelerometer"]
         static let defaultSettings = UserSettings(avatarImageName: "person.crop.circle.fill",
                                                   userName: "Avatar",
                                                   carColorName: "blue",
-                                                  dangerCarImageName: "redDangerObject",
+                                                  dangerCarImageName: "redDangerObject", 
+                                                  isButtonControl: true,
                                                   gameDesign: true,
                                                   gameLevel: 2.0)
         enum ConstantsInAlert {

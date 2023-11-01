@@ -88,15 +88,6 @@
 			path = Fonts;
 			sourceTree = "<group>";
 		};
-		5FB418BE2AADD4F500B356DC /* SettingsAndRecords */ = {
-			isa = PBXGroup;
-			children = (
-				5FB418702AA8E91100B356DC /* UserSettings.swift */,
-				5FB418722AA8EA1200B356DC /* Records.swift */,
-			);
-			path = SettingsAndRecords;
-			sourceTree = "<group>";
-		};
 		5FB8F2A32A91167000DD0B78 = {
 			isa = PBXGroup;
 			children = (
@@ -118,15 +109,14 @@
 		5FB8F2AE2A91167000DD0B78 /* AsphaltMadness */ = {
 			isa = PBXGroup;
 			children = (
+				5FCDE5DA2AF11E3200603435 /* Services */,
 				5FB8F2DB2A93C22800DD0B78 /* Application */,
+				5FCDE5D92AF11E0A00603435 /* Models */,
 				5FB8F2DC2A93C23B00DD0B78 /* Controllers */,
 				5FB8F2DF2A93C2A900DD0B78 /* Views */,
-				5FB418BE2AADD4F500B356DC /* SettingsAndRecords */,
-				5FB418BA2AAC581400B356DC /* DataManager.swift */,
 				5FB8F2D32A91291F00DD0B78 /* Extensions.swift */,
 				5FB8F2E02A95244C00DD0B78 /* Enums.swift */,
 				5FB8F2DD2A93C27900DD0B78 /* Resources */,
-				5FB8F2BD2A91167100DD0B78 /* Info.plist */,
 			);
 			path = AsphaltMadness;
 			sourceTree = "<group>";
@@ -156,6 +146,7 @@
 		5FB8F2DD2A93C27900DD0B78 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5FB8F2BD2A91167100DD0B78 /* Info.plist */,
 				5FB418742AA8F21500B356DC /* Data.swift */,
 				5F570CBC2A97C96F00DA3E9C /* Fonts */,
 				5FB8F2B82A91167100DD0B78 /* Assets.xcassets */,
@@ -171,6 +162,23 @@
 				5FB418EB2AAE204B00B356DC /* CircularImageView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		5FCDE5D92AF11E0A00603435 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5FB418722AA8EA1200B356DC /* Records.swift */,
+				5FB418702AA8E91100B356DC /* UserSettings.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5FCDE5DA2AF11E3200603435 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				5FB418BA2AAC581400B356DC /* DataManager.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		C27D2C21948393E27C04DC52 /* Frameworks */ = {
@@ -454,7 +462,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9Q5PU57D77;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AsphaltMadness/Info.plist;
+				INFOPLIST_FILE = AsphaltMadness/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -464,7 +472,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "romanvlasov390-inbox.ru.AsphaltMadness";
+				PRODUCT_BUNDLE_IDENTIFIER = "romanvlasov390-inbox.ru";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -485,7 +493,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9Q5PU57D77;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AsphaltMadness/Info.plist;
+				INFOPLIST_FILE = AsphaltMadness/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -495,7 +503,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "romanvlasov390-inbox.ru.AsphaltMadness";
+				PRODUCT_BUNDLE_IDENTIFIER = "romanvlasov390-inbox.ru";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

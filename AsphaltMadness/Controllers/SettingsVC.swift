@@ -9,6 +9,7 @@ final class SettingsVC: UIViewController {
     private var selectedLevel: Double?
     private var selectedDangerObjectIndex: Int?
     private var isMinimalisticDesign: Bool?
+    private var isButtonControl: Bool?
     
     //MARK: - User name
     private lazy var gamerNameTextField: UITextField = {
@@ -71,11 +72,17 @@ final class SettingsVC: UIViewController {
         segmentControl.addTarget(self, action: #selector(designSegmentDidChange(_:)), for: .valueChanged)
         return segmentControl
     }()
+    //MARK: - Car control variant
+    private lazy var carRaceSegmentControl: UISegmentedControl = {
+        let segmentControl = UISegmentedControl(items: Constants.Settings.raceSegmentControlItems)
+        segmentControl.addTarget(self, action: #selector(raceSegmentDidChange(_:)), for: .valueChanged)
+        return segmentControl
+    }()
     
     //MARK: - Choosing level of the game
     private lazy var levelSegmentControl: UISegmentedControl = {
         let segmentControl = UISegmentedControl(items: Constants.Settings.levelSegmentControlItems)
-        segmentControl.addTarget(self, action: #selector(segmentDidChange(_:)), for: .valueChanged)
+        segmentControl.addTarget(self, action: #selector(levelSegmentDidChange(_:)), for: .valueChanged)
         return segmentControl
     }()
     
@@ -127,6 +134,7 @@ final class SettingsVC: UIViewController {
         view.addSubview(carColorsCollectionView)
         view.addSubview(dangerObjectsPanel)
         view.addSubview(levelSegmentControl)
+        view.addSubview(carRaceSegmentControl)
         view.addSubview(dangerDesignSegmentControl)
     }
     
@@ -153,6 +161,8 @@ final class SettingsVC: UIViewController {
         
         dangerDesignSegmentControl.selectedSegmentIndex = settings.gameDesign ? 0 : 1
         isMinimalisticDesign = settings.gameDesign
+        
+        carRaceSegmentControl.selectedSegmentIndex = settings.isButtonControl ? 0 : 1
         
         dangerObjectView.image = UIImage(named: settings.dangerCarImageName)
         selectedDangerObjectIndex = dangerObjectsList.firstIndex(where: { $0 == settings.dangerCarImageName })
@@ -189,6 +199,10 @@ final class SettingsVC: UIViewController {
             settings.gameDesign = isMinimalisticDesign
         }
         
+        if let isButtonControl = isButtonControl {
+            settings.isButtonControl = isButtonControl
+        }
+        
         UserDefaults.standard.set(encodable: settings, forKey: Constants.UserDefaultsKeys.userSettingsKey)
     }
     
@@ -199,8 +213,12 @@ final class SettingsVC: UIViewController {
     }
     
     // MARK: - Changing user settings actions
-    @objc private func segmentDidChange(_ sender: UISegmentedControl) {
+    @objc private func levelSegmentDidChange(_ sender: UISegmentedControl) {
         selectedLevel = Double(sender.selectedSegmentIndex)
+    }
+    
+    @objc private func raceSegmentDidChange(_ sender: UISegmentedControl) {
+        isButtonControl = sender.selectedSegmentIndex == .zero
     }
     
     @objc private func designSegmentDidChange(_ sender: UISegmentedControl) {
@@ -303,6 +321,11 @@ extension SettingsVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSo
         dangerDesignSegmentControl.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(dangerObjectsPanel.snp.bottom).offset(Constants.Offsets.medium)
+        }
+        
+        carRaceSegmentControl.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.top.equalTo(dangerDesignSegmentControl.snp.bottom).offset(Constants.Offsets.medium)
         }
         
         levelSegmentControl.snp.makeConstraints { make in

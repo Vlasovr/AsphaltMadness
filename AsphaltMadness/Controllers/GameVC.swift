@@ -1,4 +1,5 @@
 import UIKit
+import CoreMotion
 
 final class GameVC: UIViewController {
     
@@ -93,6 +94,7 @@ final class GameVC: UIViewController {
             dynamicAnimator.addBehavior(snap)
         }
     }
+    
     //MARK: - Load game settings
     private func setupGameSettings() {
         if let userSettings = UserDefaults.standard.object(UserSettings.self, forKey: Constants.UserDefaultsKeys.userSettingsKey) {
@@ -104,7 +106,30 @@ final class GameVC: UIViewController {
                              upperView: upperRoadView,
                              duration: gameLevel)
             setupTimers(with: userSettings)
+            
+            setupRaceControlStatement(with: userSettings)
         }
+    }
+    
+    private func setupRaceControlStatement(with userSettings: UserSettings) {
+        guard !userSettings.isButtonControl else { return }
+        buttonsContainerView.removeFromSuperview()
+        runGyroscope()
+    }
+    
+    func runGyroscope() {
+        let manager = CMMotionManager()
+        guard manager.isGyroAvailable else { return }
+        manager.gyroUpdateInterval = Constants.Game.gyroUpdateInterval
+         
+        manager.startGyroUpdates(to: .main) { data, error in
+            self.moveCarWithAccelerometer(xValue: data!.rotationRate.z)
+        }
+    }
+    
+    private func moveCarWithAccelerometer(xValue: CGFloat) {
+        carView.frame.origin.x = carView.frame.origin.x + view.frame.width 
+                                    * xValue * Constants.Game.movingCoefficient
     }
     
     //MARK: - Setup danger objects with timers, could be remade for better game experience
@@ -300,7 +325,7 @@ final class GameVC: UIViewController {
     }
 }
 
-// MARK: - Setupping frames and constraintes and UI
+// MARK: - Setupping frames, constraintes, UI
 extension GameVC {
     
     private func addSubviews() {
